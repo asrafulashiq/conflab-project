@@ -47,7 +47,6 @@ class Trainer(DefaultTrainer):
     are working on a new research project. In that case you can write your
     own training loop. You can use "tools/plain_train_net.py" as an example.
     """
-
     @classmethod
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         """
@@ -66,32 +65,21 @@ class Trainer(DefaultTrainer):
                     dataset_name,
                     distributed=True,
                     output_dir=output_folder,
-                )
-            )
+                ))
         if evaluator_type in ["coco", "coco_panoptic_seg"]:
-            evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
+            evaluator_list.append(
+                COCOEvaluator(dataset_name,
+                              tasks="bbox",
+                              distributed=False,
+                              output_dir=output_folder))
         if evaluator_type == "coco_panoptic_seg":
-            evaluator_list.append(COCOPanopticEvaluator(dataset_name, output_folder))
-        if evaluator_type == "cityscapes_instance":
-            assert (
-                torch.cuda.device_count() >= comm.get_rank()
-            ), "CityscapesEvaluator currently do not work with multiple machines."
-            return CityscapesInstanceEvaluator(dataset_name)
-        if evaluator_type == "cityscapes_sem_seg":
-            assert (
-                torch.cuda.device_count() >= comm.get_rank()
-            ), "CityscapesEvaluator currently do not work with multiple machines."
-            return CityscapesSemSegEvaluator(dataset_name)
-        elif evaluator_type == "pascal_voc":
-            return PascalVOCDetectionEvaluator(dataset_name)
-        elif evaluator_type == "lvis":
-            return LVISEvaluator(dataset_name, output_dir=output_folder)
+            evaluator_list.append(
+                COCOPanopticEvaluator(dataset_name, output_folder))
+
         if len(evaluator_list) == 0:
             raise NotImplementedError(
                 "no Evaluator for the dataset {} with the type {}".format(
-                    dataset_name, evaluator_type
-                )
-            )
+                    dataset_name, evaluator_type))
         elif len(evaluator_list) == 1:
             return evaluator_list[0]
         return DatasetEvaluators(evaluator_list)
@@ -104,9 +92,10 @@ class Trainer(DefaultTrainer):
         logger.info("Running inference with test-time augmentation ...")
         model = GeneralizedRCNNWithTTA(cfg, model)
         evaluators = [
-            cls.build_evaluator(
-                cfg, name, output_folder=os.path.join(cfg.OUTPUT_DIR, "inference_TTA")
-            )
+            cls.build_evaluator(cfg,
+                                name,
+                                output_folder=os.path.join(
+                                    cfg.OUTPUT_DIR, "inference_TTA"))
             for name in cfg.DATASETS.TEST
         ]
         res = cls.test(cfg, model, evaluators)
@@ -132,15 +121,13 @@ def main(args):
     if args.eval_only:
         model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-            cfg.MODEL.WEIGHTS, resume=args.resume
-        )
+            cfg.MODEL.WEIGHTS, resume=args.resume)
         res = Trainer.test(cfg, model)
         if cfg.TEST.AUG.ENABLED:
             res.update(Trainer.test_with_TTA(cfg, model))
         if comm.is_main_process():
             verify_results(cfg, res)
         return res
-
     """
     If you'd like to do anything fancier than the standard training logic,
     consider writing your own training loop (see plain_train_net.py) or
@@ -149,9 +136,10 @@ def main(args):
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     if cfg.TEST.AUG.ENABLED:
-        trainer.register_hooks(
-            [hooks.EvalHook(0, lambda: trainer.test_with_TTA(cfg, trainer.model))]
-        )
+        trainer.register_hooks([
+            hooks.EvalHook(0,
+                           lambda: trainer.test_with_TTA(cfg, trainer.model))
+        ])
     return trainer.train()
 
 
@@ -164,5 +152,5 @@ if __name__ == "__main__":
         num_machines=args.num_machines,
         machine_rank=args.machine_rank,
         dist_url=args.dist_url,
-        args=(args,),
+        args=(args, ),
     )
