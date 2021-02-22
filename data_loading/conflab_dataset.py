@@ -26,7 +26,6 @@ def scale_kp_xy(kp: List[float], w, h) -> List[float]:
 
 
 def get_conflab_dict(img_root_dir: str, annotation_dir: str) -> List[Dict]:
-
     counter_image = 0
     for ann_file in os.listdir(annotation_dir)[5:]:
         parsed_info = extract_file_info(ann_file)
@@ -95,6 +94,17 @@ def get_conflab_dict(img_root_dir: str, annotation_dir: str) -> List[Dict]:
         break
     return dataset_dicts
 
+
+# --------------------------------- Register --------------------------------- #
+from detectron2.data import DatasetCatalog
+
+DATASET_NAME = "conflab-dataset"
+IMG_ROOT_DIR = "/home/ash/datasets/conflab-mm/frames/videoSegments"
+ANN_DIR = "/home/ash/datasets/conflab-mm/annotations"
+
+DatasetCatalog.register(
+    DATASET_NAME, lambda: get_conflab_dict(img_root_dir=IMG_ROOT_DIR,
+                                           annotation_dir=ANN_DIR))
 
 if __name__ == "__main__":
     from detectron2.utils.visualizer import Visualizer
