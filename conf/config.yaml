@@ -1,0 +1,40 @@
+# @package _global_
+
+defaults:
+  - override hydra/hydra_logging: none
+  - override hydra/job_logging: none
+
+dataset: "conflab-dataset"
+
+img_root_dir: "${env:HOME}/datasets/conflab-mm/frames/videoSegments"
+ann_dir: "${env:HOME}/datasets/conflab-mm/annotations"
+
+model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_1x.yaml"
+
+exp_name: "kp_base"
+output_dir: "./ckpt/${exp_name}"
+
+train_dataset: ${dataset}
+test_dataset: ${dataset}
+
+num_workers: 4
+num_classes: 1
+
+eval_only: true
+pretrained: true
+
+visualize: true
+num_items: 10
+
+num_gpus: 1
+num_machines: 1
+batch_size: 2
+max_iters: 5000
+learning_rate: 0.0005
+
+size: [960, 540]
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null

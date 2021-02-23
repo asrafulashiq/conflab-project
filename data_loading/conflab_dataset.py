@@ -8,6 +8,7 @@ import json
 from tqdm import tqdm
 import cv2
 import random
+from detectron2.data import DatasetCatalog
 
 
 def extract_file_info(filename: str) -> Mapping:
@@ -96,15 +97,11 @@ def get_conflab_dict(img_root_dir: str, annotation_dir: str) -> List[Dict]:
 
 
 # --------------------------------- Register --------------------------------- #
-from detectron2.data import DatasetCatalog
+def register_dataset(args):
+    DatasetCatalog.register(
+        args.dataset, lambda: get_conflab_dict(img_root_dir=args.img_root_dir,
+                                               annotation_dir=args.ann_dir))
 
-DATASET_NAME = "conflab-dataset"
-IMG_ROOT_DIR = "/home/ash/datasets/conflab-mm/frames/videoSegments"
-ANN_DIR = "/home/ash/datasets/conflab-mm/annotations"
-
-DatasetCatalog.register(
-    DATASET_NAME, lambda: get_conflab_dict(img_root_dir=IMG_ROOT_DIR,
-                                           annotation_dir=ANN_DIR))
 
 if __name__ == "__main__":
     from detectron2.utils.visualizer import Visualizer
