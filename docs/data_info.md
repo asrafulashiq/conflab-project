@@ -39,6 +39,24 @@ For `cam10`:
 - vid3-seg8-scaled-denoised.mp4
 - vid3-seg9-scaled-denoised.mp4
 
+## Annotation file 
+
+Each annotation file (located in `/home/ash/datasets/conflab-mm/pose`) has - `'info', 'annotations', 'categories'` keys
+
+data['annotations'] has only `skeletons` keys, which is a list for each image
+
+data['annotations']['skeletons'][i][k] has the information:
+```
+{'category_id': 1,
+ 'id': 27,
+ 'image_id': 0,
+ 'keypoints': [...],
+ 'num_keypoints': 17,
+ 'occluded': [0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1]}
+
+```
+
+
 ## Info
 
 - For each camera, we will have **00:21:16** of data, and between the 5 cameras, we are expecting **01:46:20** of data

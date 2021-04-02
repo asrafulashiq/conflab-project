@@ -1,7 +1,6 @@
 import torch, torchvision
 import detectron2
 from detectron2.utils.logger import setup_logger
-setup_logger()
 import numpy as np
 import os, json, cv2, random
 
@@ -11,14 +10,17 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
+from detectron2.utils.visualizer import Visualizer
 
 import matplotlib.pyplot as plt
 import cv2
 from data_loading import conflab_dataset
 
-conf_data = DatasetCatalog.get("conflab-dataset")
+setup_logger()
 
-from detectron2.utils.visualizer import Visualizer
+conf_data = conflab_dataset.get_conflab_dict(
+    img_root_dir="/home/ash/datasets/conflab-mm/frames/videoSegments",
+    annotation_dir="/home/ash/datasets/conflab-mm/annotations")
 
 cfg = get_cfg()
 

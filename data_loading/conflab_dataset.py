@@ -1,7 +1,6 @@
 from typing import Dict, List, Mapping
 from detectron2.structures import BoxMode
 import os
-from pathlib import Path
 import numpy as np
 import parse
 import json
@@ -38,9 +37,11 @@ def get_conflab_dict(img_root_dir: str, annotation_dir: str) -> List[Dict]:
         assert os.path.exists(img_dir)
 
         with open(os.path.join(annotation_dir, ann_file), 'r') as fp:
-            data = json.load(fp)
+            full_data = json.load(fp)
 
         dataset_dicts = []
+
+        data = full_data['annotations']['skeletons']
 
         for idx, v in tqdm(enumerate(data)):
             # v contain info for each image
@@ -108,7 +109,7 @@ if __name__ == "__main__":
 
     dataset_dicts = get_conflab_dict(
         img_root_dir="/home/ash/datasets/conflab-mm/frames/videoSegments",
-        annotation_dir="/home/ash/datasets/conflab-mm/annotations")
+        annotation_dir="/home/ash/datasets/conflab-mm/pose")
 
     for d in random.sample(dataset_dicts, 5):
         img = cv2.imread(d["file_name"])

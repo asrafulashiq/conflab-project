@@ -1,3 +1,12 @@
+username="e000768"
+password="TUDelft@asrafulashiq1125"
+
+# ---------------------------- download annotation --------------------------- #
+ann_url="https://webdata.tudelft.nl/staff-bulk/ewi/insy/SPCDataSets/conflab-mm/processed/annotation/pose"
+wget --user "${username}" --password "${password}" \
+    -r -np -R "index.html*" -P ${HOME}/dataset/conflab-mm/tmp "${ann_url}"
+
+# -------------------- download videos and extract frames -------------------- #
 mode="d"
 while getopts "m:" opt; do
     case ${opt} in
@@ -34,8 +43,6 @@ vid_names2=(
 )
 
 if [[ "$mode" = "d"* ]]; then
-    username="e000768"
-    password="TUDelft@asrafulashiq1125"
 
     root_url="https://webdata.tudelft.nl/staff-bulk/ewi/insy/SPCDataSets/conflab-mm/processed/annotation/videoSegments/"
 
