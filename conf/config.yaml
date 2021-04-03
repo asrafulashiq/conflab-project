@@ -30,6 +30,7 @@ num_classes: 1
 
 eval_only: true
 pretrained: true
+resume: false
 
 visualize: true
 num_items: 10

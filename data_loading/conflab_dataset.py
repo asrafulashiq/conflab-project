@@ -133,7 +133,12 @@ def register_conflab_dataset(args: DictConfig):
         with open(args.coco_json_path, "w") as fp:
             json.dump(coco_info, fp)
 
-    keypoints, keypoint_connection_rules = get_kp_names()
+        cocosplit.split(args.coco_json_path,
+                        args.coco_json_path_train,
+                        args.coco_json_path_test,
+                        split=args.train_split)
+
+    keypoints, keypoint_connection_rules, keypoint_flip_map = get_kp_names()
 
     def _register(dataset, ann_path):
         register_coco_instances(dataset, {}, ann_path, args.img_root_dir)
@@ -141,12 +146,8 @@ def register_conflab_dataset(args: DictConfig):
         MetadataCatalog.get(dataset).keypoint_names = keypoints
         MetadataCatalog.get(
             dataset).keypoint_connection_rules = keypoint_connection_rules
+        MetadataCatalog.get(dataset).keypoint_flip_map = keypoint_flip_map
 
-    # register_coco_instances(args.dataset, {}, args.coco_json_path)
-    cocosplit.split(args.coco_json_path,
-                    args.coco_json_path_train,
-                    args.coco_json_path_test,
-                    split=args.train_split)
     _register(args.dataset, args.coco_json_path)
     _register(args.train_dataset, args.coco_json_path_train)
     _register(args.test_dataset, args.coco_json_path_test)
@@ -168,8 +169,14 @@ def get_kp_names():
     for i, (a, b) in enumerate(connections):
         keypoint_connection_rules.append(
             (keypoints[a], keypoints[b], colors[i]))
+    keypoint_flip_map = (('leftFoot', 'rightFoot'),
+                         ('leftShoulder', 'rightShoulder'), ('leftElbow',
+                                                             'rightElbow'),
+                         ('leftWrist', 'rightWrist'), ('leftHip', 'rightHip'),
+                         ('leftKnee', 'rightKnee'), ('leftAnkle',
+                                                     'rightAnkle'))
 
-    return keypoints, keypoint_connection_rules
+    return keypoints, keypoint_connection_rules, keypoint_flip_map
 
 
 @hydra.main(config_name='config', config_path='../conf')
@@ -185,10 +192,8 @@ def main(args):
         visualizer = Visualizer(img[:, :, ::-1], metadata=metadata, scale=0.8)
         out = visualizer.draw_dataset_dict(d)
         cv2_im = out.get_image()[:, :, ::-1]
-
         cv2.imshow(d["file_name"], cv2_im)
         cv2.waitKey(0)
-
     cv2.destroyAllWindows()
 
 
