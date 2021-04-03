@@ -7,9 +7,12 @@ defaults:
 dataset: "conflab-dataset"
 
 img_root_dir: "${env:HOME}/datasets/conflab-mm/frames/videoSegments"
-ann_dir: "${env:HOME}/datasets/conflab-mm/annotations"
+ann_dir: "${env:HOME}/datasets/conflab-mm/pose"
 
-model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_1x.yaml"
+create_coco: false
+coco_json_path: "store/conflab_coco.json"
+
+model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
 
 exp_name: "kp_base"
 output_dir: "./ckpt/${exp_name}"

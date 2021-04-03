@@ -20,3 +20,4 @@ output
 output/**
 datasets
 **/lightning_logs/**
+store/**

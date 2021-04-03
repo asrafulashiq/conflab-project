@@ -16,8 +16,12 @@ while getopts "m:" opt; do
     esac
 done
 
+# cams1=("cam2")
+# vid_names1=("vid2-seg7-scaled-denoised.mp4")
+
 cams1=("cam2" "cam4" "cam6" "cam8")
 vid_names1=(
+    "vid2-seg7-scaled-denoised.mp4"
     "vid2-seg8-scaled-denoised.mp4"
     "vid2-seg9-scaled-denoised.mp4"
     "vid3-seg1-scaled-denoised.mp4"
@@ -52,6 +56,9 @@ if [[ "$mode" = "d"* ]]; then
     for cam in "${cams1[@]}"; do
         for name in "${vid_names1[@]}"; do
             out_dir="${save_dir}/${cam}"
+            if [ -e "${out_dir}/${name}" ]; then
+                continue
+            fi
             mkdir -p $out_dir
             url="${root_url}/${cam}/${name}"
             wget --user "${username}" --password "${password}" -P "${out_dir}" "${url}"
@@ -61,6 +68,9 @@ if [[ "$mode" = "d"* ]]; then
     for cam in "${cams2[@]}"; do
         for name in "${vid_names2[@]}"; do
             out_dir="${save_dir}/${cam}"
+            if [ -e "${out_dir}/${name}" ]; then
+                continue
+            fi
             mkdir -p $out_dir
             url="${root_url}/${cam}/${name}"
             wget --user "${username}" --password "${password}" -P "${out_dir}" "${url}"
@@ -77,6 +87,9 @@ elif [[ "$mode" = "e"* ]]; then
         for name in "${vid_names1[@]}"; do
             basename=$(cut -d'.' -f1 <<<"$name")
             out_path="${save_dir}/${cam}/${basename}"
+            if [ -e "${out_path}" ]; then
+                continue
+            fi
             mkdir -p "${out_path}"
             in_path="${in_dir}/${cam}/${name}"
             ffmpeg -i "${in_path}" "${out_path}/%06d.jpg"
@@ -87,6 +100,9 @@ elif [[ "$mode" = "e"* ]]; then
         for name in "${vid_names2[@]}"; do
             basename=$(cut -d'.' -f1 <<<"$name")
             out_path="${save_dir}/${cam}/${basename}"
+            if [ -e "${out_path}" ]; then
+                continue
+            fi
             mkdir -p "${out_path}"
             in_path="${in_dir}/${cam}/${name}"
             ffmpeg -i "${in_path}" "${out_path}/%06d.jpg"

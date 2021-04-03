@@ -15,12 +15,9 @@ def visualize_det2(dataset_dicts: List[dict],
     for d in random.sample(dataset_dicts, count):
         im = cv2.imread(d["file_name"])
         outputs = predictor(im)
-        v = Visualizer(
-            im[:, :, ::-1],
-            metadata=metadata,
-            instance_mode=ColorMode.
-            IMAGE_BW  # remove the colors of unsegmented pixels. This option is only available for segmentation models
-        )
+        v = Visualizer(im[:, :, ::-1],
+                       metadata=metadata,
+                       instance_mode=ColorMode.IMAGE)
         out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         cv2.imshow("", out.get_image()[:, :, ::-1])
         cv2.waitKey(0)

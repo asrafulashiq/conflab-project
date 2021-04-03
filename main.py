@@ -4,6 +4,7 @@ import os
 from typing import Dict, List
 from detectron2.data.catalog import MetadataCatalog
 import torch
+from loguru import logger
 import hydra
 from detectron2 import model_zoo
 from omegaconf import OmegaConf, DictConfig
@@ -106,29 +107,26 @@ def main(args):
             model = Trainer.build_model(cfg)
             DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
             res = Trainer.test(cfg, model)
-            print(res)
+            logger.info(res)
             return res
 
         else:
             test_dataset: List[Dict] = DatasetCatalog.get(args.test_dataset)
-            # metadata = MetadataCatalog.get(args.test_dataset)
+            metadata = MetadataCatalog.get(args.test_dataset)
             predictor = Predictor(cfg)
             visualize_det2(test_dataset,
                            predictor,
-                           metadata=None,
+                           metadata=metadata,
                            count=args.num_items)
 
 
 @hydra.main(config_name='config', config_path='conf')
 def hydra_main(args: DictConfig):
-    print("Command Line Args:", args)
-    conflab_dataset.register_dataset(args)
+    logger.info("Command Line Args:\n{}".format(
+        OmegaConf.to_yaml(args, resolve=True)))
+    conflab_dataset.register_conflab_dataset(args)
 
-    launch(
-        main,
-        args.num_gpus,
-        args=(args, ),
-    )
+    launch(main, args.num_gpus, args=(args, ))
 
 
 if __name__ == "__main__":
