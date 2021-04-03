@@ -109,7 +109,6 @@ def main(args):
             res = Trainer.test(cfg, model)
             logger.info(res)
             return res
-
         else:
             test_dataset: List[Dict] = DatasetCatalog.get(args.test_dataset)
             metadata = MetadataCatalog.get(args.test_dataset)

@@ -1,4 +1,5 @@
 from typing import Dict, List, Mapping
+from utils import cocosplit
 from detectron2.structures import BoxMode
 import os
 import hydra
@@ -103,10 +104,10 @@ def convert_conflab_to_coco(img_root_dir: str,
 
                 fn_none = lambda x: [i for i in x if i is not None]
                 x1, y1, x2, y2 = [
-                    np.min(fn_none(px)),
-                    np.min(fn_none(py)),
-                    np.max(fn_none(px)),
-                    np.max(fn_none(py))
+                    min(fn_none(px)),
+                    min(fn_none(py)),
+                    max(fn_none(px)),
+                    max(fn_none(py))
                 ]
 
                 bbox = [x1, y1, x2 - x1, y2 - y1]
@@ -119,7 +120,7 @@ def convert_conflab_to_coco(img_root_dir: str,
 
                 coco_data["annotations"].append(record_ann)
 
-            # if counter_image > 1000:
+            # if counter_image > 100:
             #     return coco_data
     return coco_data
 
@@ -132,14 +133,23 @@ def register_conflab_dataset(args: DictConfig):
         with open(args.coco_json_path, "w") as fp:
             json.dump(coco_info, fp)
 
-    register_coco_instances(args.dataset, {}, args.coco_json_path,
-                            args.img_root_dir)
-
-    # set meta data catalog
     keypoints, keypoint_connection_rules = get_kp_names()
-    MetadataCatalog.get(args.dataset).keypoint_names = keypoints
-    MetadataCatalog.get(
-        args.dataset).keypoint_connection_rules = keypoint_connection_rules
+
+    def _register(dataset, ann_path):
+        register_coco_instances(dataset, {}, ann_path, args.img_root_dir)
+        # set meta data catalog
+        MetadataCatalog.get(dataset).keypoint_names = keypoints
+        MetadataCatalog.get(
+            dataset).keypoint_connection_rules = keypoint_connection_rules
+
+    # register_coco_instances(args.dataset, {}, args.coco_json_path)
+    cocosplit.split(args.coco_json_path,
+                    args.coco_json_path_train,
+                    args.coco_json_path_test,
+                    split=args.train_split)
+    _register(args.dataset, args.coco_json_path)
+    _register(args.train_dataset, args.coco_json_path_train)
+    _register(args.test_dataset, args.coco_json_path_test)
 
 
 def get_kp_names():
@@ -168,8 +178,8 @@ def main(args):
     args.coco_json_path = os.path.join("..", args.coco_json_path)
     register_conflab_dataset(args)
 
-    dataset_dicts: List[Dict] = DatasetCatalog.get(args.dataset)
-    metadata = MetadataCatalog.get(args.dataset)
+    dataset_dicts: List[Dict] = DatasetCatalog.get(args.test_dataset)
+    metadata = MetadataCatalog.get(args.test_dataset)
     for d in random.sample(dataset_dicts, 5):
         img = cv2.imread(d["file_name"])
         visualizer = Visualizer(img[:, :, ::-1], metadata=metadata, scale=0.8)
