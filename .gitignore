@@ -21,3 +21,4 @@ output/**
 datasets
 **/lightning_logs/**
 store/**
+figs/**

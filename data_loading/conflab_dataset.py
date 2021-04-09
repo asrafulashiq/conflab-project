@@ -1,6 +1,7 @@
-from typing import Dict, List, Mapping
+from typing import Dict, List, Mapping, Optional
+
+from PIL import Image
 from utils import cocosplit
-from detectron2.structures import BoxMode
 import os
 import hydra
 import numpy as np
@@ -14,6 +15,7 @@ from omegaconf import DictConfig
 from detectron2.data import DatasetCatalog, MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
 import seaborn as sns
+from data_loading.utils import AnnStat
 
 
 def extract_file_info(filename: str) -> Mapping:
@@ -32,10 +34,15 @@ def scale_kp_xy(kp: List[float], w, h) -> List[float]:
 
 
 def convert_conflab_to_coco(img_root_dir: str,
-                            annotation_dir: str) -> List[Dict]:
+                            annotation_dir: str,
+                            total_ann: Optional[int] = None,
+                            thresh_null: float = 0.1) -> List[Dict]:
+
     counter_image = 0
     counter = 0
     coco_data = {"info": {}, "images": [], "annotations": [], "categories": []}
+
+    ann_stat = AnnStat()
 
     dict_ims = {}  # all_images that have been seen so far
 
@@ -67,32 +74,37 @@ def convert_conflab_to_coco(img_root_dir: str,
                 logger.warning(f"{filename} does not exist")
                 continue
 
-            height, width = cv2.imread(filename).shape[:2]
+            width, height = Image.open(filename).size
 
             if filename not in dict_ims:
-                # this is a new image file, add it to dict
-
                 counter_image += 1
-                record = dict()
-                record["file_name"] = os.path.join(
+
+                record_im = dict()
+                record_im["file_name"] = os.path.join(
                     img_ann_dir,
                     f"{annotations_for_image[0][1]['image_id']+1:06d}.jpg")
-                record["id"] = counter_image
-                record["height"] = height
-                record["width"] = width
-                dict_ims[filename] = record
+                record_im["id"] = counter_image
+                record_im["height"] = height
+                record_im["width"] = width
+                dict_ims[filename] = record_im
 
-                coco_data["images"].append(record)
-
+            coco_ann_im = []
             for _, anno in annotations_for_image:
+                ann_stat.update_ann(filename)
                 counter += 1
+
                 record_ann = {}
                 record_ann["id"] = counter
                 record_ann["image_id"] = dict_ims[filename]["id"]
                 record_ann["category_id"] = 1  # NOTE: person category
 
-                has_none = any(x is None for x in anno["keypoints"])
-                if has_none:
+                null_values = [x is None for x in anno["keypoints"]]
+
+                ann_stat.update_pt(len(anno["keypoints"]), sum(null_values),
+                                   filename)
+                has_null = False
+                if sum(null_values) > 0:
+                    has_null = True
                     # logger.warning(f"has none in {filename}")
                     continue
 
@@ -113,15 +125,27 @@ def convert_conflab_to_coco(img_root_dir: str,
                 bbox = [x1, y1, x2 - x1, y2 - y1]
                 record_ann["bbox"] = bbox
                 record_ann["segmentation"] = []
+
                 record_ann["keypoints"] = anno["keypoints"]
+                record_ann["num_keypoints"] = len(anno["keypoints"])
                 record_ann["area"] = int(
                     (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
                 record_ann["iscrowd"] = 0
 
-                coco_data["annotations"].append(record_ann)
+                coco_ann_im.append(record_ann)
 
-            # if counter_image > 100:
-            #     return coco_data
+                ann_stat.update_nonnull_bb(filename)
+                ann_stat.update_nonnull_kp(filename)
+
+            if ann_stat.null_kp(filename) < thresh_null:
+                coco_data["annotations"].extend(coco_ann_im)
+                coco_data["images"].append(record_im)
+
+            if total_ann is not None and counter_image > total_ann:
+                break
+
+        ann_stat.stat()
+
     return coco_data
 
 
@@ -129,7 +153,9 @@ def register_conflab_dataset(args: DictConfig):
     if args.create_coco:
         # convert to coco
         coco_info = convert_conflab_to_coco(img_root_dir=args.img_root_dir,
-                                            annotation_dir=args.ann_dir)
+                                            annotation_dir=args.ann_dir,
+                                            total_ann=args.total_ann,
+                                            thresh_null=args.thresh_null_kp)
         with open(args.coco_json_path, "w") as fp:
             json.dump(coco_info, fp)
 
@@ -177,25 +203,3 @@ def get_kp_names():
                                                      'rightAnkle'))
 
     return keypoints, keypoint_connection_rules, keypoint_flip_map
-
-
-@hydra.main(config_name='config', config_path='../conf')
-def main(args):
-    from detectron2.utils.visualizer import Visualizer
-    args.coco_json_path = os.path.join("..", args.coco_json_path)
-    register_conflab_dataset(args)
-
-    dataset_dicts: List[Dict] = DatasetCatalog.get(args.test_dataset)
-    metadata = MetadataCatalog.get(args.test_dataset)
-    for d in random.sample(dataset_dicts, 5):
-        img = cv2.imread(d["file_name"])
-        visualizer = Visualizer(img[:, :, ::-1], metadata=metadata, scale=0.8)
-        out = visualizer.draw_dataset_dict(d)
-        cv2_im = out.get_image()[:, :, ::-1]
-        cv2.imshow(d["file_name"], cv2_im)
-        cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-if __name__ == "__main__":
-    main()

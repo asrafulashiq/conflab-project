@@ -1,3 +1,6 @@
+"""
+Evaluate coco pretrained models
+"""
 import os
 from typing import Dict, List
 from detectron2.data.catalog import MetadataCatalog
@@ -5,6 +8,14 @@ from loguru import logger
 import hydra
 from detectron2 import model_zoo
 from omegaconf import OmegaConf, DictConfig
+from typing import List, Optional
+import random
+import numpy as np
+import cv2
+from detectron2.utils.visualizer import Visualizer
+from detectron2.engine import DefaultPredictor
+from detectron2.data.catalog import Metadata
+from detectron2.data import transforms as T
 
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
@@ -16,7 +27,6 @@ from detectron2.data import (DatasetCatalog, DatasetMapper,
                              build_detection_test_loader)
 
 from detectron2.engine import DefaultTrainer, launch, default_setup, DefaultPredictor
-from detectron2.data import transforms as T
 
 from data_loading import conflab_dataset
 from utils import visualize_det2, create_train_augmentation, create_test_augmentation
@@ -62,33 +72,14 @@ def setup(args):
     cfg.DATASETS.TRAIN = (args.train_dataset, )
     cfg.DATASETS.TEST = (args.test_dataset, )
     cfg.DATALOADER.NUM_WORKERS = args.num_workers
-
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = args.num_classes
     cfg.OUTPUT_DIR = args.output_dir
+    os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+
     cfg.image_w = args.size[0]
     cfg.image_h = args.size[1]
 
-    if args.eval_only is False:
-        cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
-        cfg.SOLVER.IMS_PER_BATCH = args.batch_size
-        cfg.SOLVER.BASE_LR = args.learning_rate
-        cfg.SOLVER.MAX_ITER = args.max_iters
-        cfg.SOLVER.WARMUP_ITERS = int(args.max_iters / 10)
-        cfg.SOLVER.STEPS = (int(args.max_iters / 2),
-                            int(args.max_iters * 2 / 3))
-        os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
-    else:
-        if args.pretrained:
-            cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
-        else:
-            cfg.MODEL.WEIGHTS = os.path.join(
-                cfg.OUTPUT_DIR,
-                "model_final.pth")  # path to the model we just trained
-        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.roi_thresh  # set a custom testing threshold
-
-    if args.checkpoint is not None:
-        logger.debug(f"load checkpoint from {args.checkpoint}")
-        cfg.MODEL.WEIGHTS = os.path.expanduser(args.checkpoint)
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.roi_thresh  # set a custom testing threshold
 
     default_setup(cfg, args)
     return cfg
@@ -97,27 +88,21 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    if args.eval_only is False:
-        trainer = Trainer(cfg)
-
-        trainer.resume_or_load(resume=args.resume)
-        trainer.train()
-
+    if args.visualize is False:
+        model = Trainer.build_model(cfg)
+        DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
+        res = Trainer.test(cfg, model)
+        logger.info(res)
+        return res
     else:
-        if args.visualize is False:
-            model = Trainer.build_model(cfg)
-            DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
-            res = Trainer.test(cfg, model)
-            logger.info(res)
-            return res
-        else:
-            test_dataset: List[Dict] = DatasetCatalog.get(args.test_dataset)
-            metadata = MetadataCatalog.get(args.test_dataset)
-            predictor = Predictor(cfg)
-            visualize_det2(test_dataset,
-                           predictor,
-                           metadata=metadata,
-                           vis_conf=args.vis)
+        test_dataset: List[Dict] = DatasetCatalog.get(args.test_dataset)
+        # metadata = MetadataCatalog.get(args.test_dataset)
+        metadata = MetadataCatalog.get("coco_2014_val")
+        predictor = Predictor(cfg)
+        visualize_det2(test_dataset,
+                       predictor,
+                       metadata=metadata,
+                       vis_conf=args.vis)
 
 
 @hydra.main(config_name='config', config_path='conf')
@@ -125,9 +110,6 @@ def hydra_main(args: DictConfig):
     logger.info("Command Line Args:\n{}".format(
         OmegaConf.to_yaml(args, resolve=True)))
     conflab_dataset.register_conflab_dataset(args)
-
-    if args.create_coco:
-        return
 
     launch(main, args.num_gpus, args=(args, ))
 

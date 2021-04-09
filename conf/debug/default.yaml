@@ -1,0 +1,10 @@
+# @package _global_
+
+name: "dbg_base"
+
+dataset: "conflab-dataset-debug"
+coco_json_path: "store/dbg_conflab_coco.json"
+coco_json_path_train: "store/dbg_conflab_coco_train.json"
+coco_json_path_test: "store/dbg_conflab_coco_test.json"
+
+total_ann: 50
