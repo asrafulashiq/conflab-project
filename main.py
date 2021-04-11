@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List
+from utils.utils_det import configure_logger
 from detectron2.data.catalog import MetadataCatalog
 from loguru import logger
 import hydra
@@ -17,6 +18,7 @@ from detectron2.data import (DatasetCatalog, DatasetMapper,
 
 from detectron2.engine import DefaultTrainer, launch, default_setup, DefaultPredictor
 from detectron2.data import transforms as T
+import tqdm
 
 from data_loading import conflab_dataset
 from utils import visualize_det2, create_train_augmentation, create_test_augmentation
@@ -79,7 +81,8 @@ def setup(args):
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     else:
         if args.pretrained:
-            cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
+            cfg.MODEL.WEIGHTS = args.model_zoo_weights
+            #model_zoo.get_checkpoint_url(args.model_zoo)
         else:
             cfg.MODEL.WEIGHTS = os.path.join(
                 cfg.OUTPUT_DIR,
@@ -122,6 +125,9 @@ def main(args):
 
 @hydra.main(config_name='config', config_path='conf')
 def hydra_main(args: DictConfig):
+
+    configure_logger(args)
+
     logger.info("Command Line Args:\n{}".format(
         OmegaConf.to_yaml(args, resolve=True)))
     conflab_dataset.register_conflab_dataset(args)
@@ -133,4 +139,5 @@ def hydra_main(args: DictConfig):
 
 
 if __name__ == "__main__":
+
     hydra_main()

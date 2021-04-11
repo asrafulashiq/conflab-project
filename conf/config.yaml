@@ -15,8 +15,11 @@ coco_json_path: "store/conflab_coco.json"
 coco_json_path_train: "store/conflab_coco_train.json"
 coco_json_path_test: "store/conflab_coco_test.json"
 train_split: 0.8
+test_cam:
+  - cam6
 
 model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
+model_zoo_weights: "https://dl.fbaipublicfiles.com/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/137849621/model_final_a6e10b.pkl"
 
 name: "kp_base"
 output_dir: "./ckpt/${name}"
@@ -24,6 +27,9 @@ checkpoint: null # whether to load any pretrained checkpoint
 
 train_dataset: ${dataset}_train
 test_dataset: ${dataset}_test
+
+log_dir: "logs"
+log_prefix: ""
 
 num_workers: 4
 num_classes: 1
@@ -47,8 +53,10 @@ roi_thresh: 0.5
 size: [960, 540]
 
 # data creation
-thresh_null_kp: 0.1 # if less than 10% are null values, pick the image
+thresh_null_kp: 0.1 # upper limit for null values: if less than 10% are null values, pick the image
 data_create_num_vis: 10
+data_plot: false
+total_ann_per_file: null
 
 hydra:
   run:

@@ -78,7 +78,7 @@ def setup(args):
     cfg.image_w = args.size[0]
     cfg.image_h = args.size[1]
 
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
+    cfg.MODEL.WEIGHTS = args.model_zoo_weights
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.roi_thresh  # set a custom testing threshold
 
     default_setup(cfg, args)

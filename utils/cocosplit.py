@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 
 def save_coco(file, info, licenses, images, annotations, categories):
-    with open(file, 'wt', encoding='UTF-8') as coco:
+    with open(file, 'w', encoding='UTF-8') as coco:
         json.dump(
             {
                 'info': info,
@@ -14,37 +14,22 @@ def save_coco(file, info, licenses, images, annotations, categories):
                 'categories': categories
             },
             coco,
-            indent=2,
-            sort_keys=True)
+            indent=2)
 
 
 def filter_annotations(annotations, images):
-    image_ids = funcy.lmap(lambda i: int(i['id']), images)
-    return funcy.lfilter(lambda a: int(a['image_id']) in image_ids,
-                         annotations)
+    image_ids = set(map(lambda i: int(i['id']), images))
+    return list(filter(lambda a: int(a['image_id']) in image_ids, annotations))
 
 
-def split(annotation_file,
-          train_file,
-          test_file,
-          split=0.8,
-          having_annotations=True):
-    with open(annotation_file, 'rt', encoding='UTF-8') as annotations:
+def split(annotation_file, train_file, test_file, split=0.8):
+    with open(annotation_file, 'r', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
         info = coco['info']
         licenses = coco.get('licenses', [])
         images = coco['images']
         annotations = coco['annotations']
         categories = coco['categories']
-
-        number_of_images = len(images)
-
-        images_with_annotations = funcy.lmap(lambda a: int(a['image_id']),
-                                             annotations)
-
-        if having_annotations:
-            images = funcy.lremove(
-                lambda i: i['id'] not in images_with_annotations, images)
 
         x, y = train_test_split(images, train_size=split)
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from typing import List, Optional
 import numpy as np
@@ -8,6 +9,28 @@ from detectron2.data.catalog import Metadata
 from detectron2.data import transforms as T
 from omegaconf.dictconfig import DictConfig
 from tqdm import tqdm
+
+
+def configure_logger(args):
+    from loguru import logger
+    logger.configure(handlers=[
+        dict(sink=lambda msg: tqdm.write(msg, end=''),
+             level='DEBUG',
+             colorize=True,
+             format=
+             "<green>{time: MM-DD at HH:mm}</green> <level>{message}</level>",
+             enqueue=True),
+    ])
+    now = datetime.now()
+    os.makedirs(args.log_dir, exist_ok=True)
+    logfile = os.path.join(
+        args.log_dir,
+        f"{args.log_prefix}_{now.month:02d}_{now.day:02d}_{now.hour:03d}.txt")
+    logger.add(sink=logfile,
+               mode='w',
+               format="{time: MM-DD at HH:mm} | {message}",
+               level="DEBUG",
+               enqueue=True)
 
 
 def visualize_det2(dataset_dicts: List[dict],
