@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import os
 from typing import List, Optional
 from detectron2.utils.env import seed_all_rng
@@ -13,9 +14,10 @@ import torch
 from tqdm import tqdm
 from detectron2.utils.logger import setup_logger
 from detectron2.utils import comm
+import rich
 
 
-def configure_logger(args):
+def configure_logger(args, fileonly=False):
     now = datetime.now()
     os.makedirs(args.log_dir, exist_ok=True)
     logfile = os.path.join(
@@ -23,22 +25,25 @@ def configure_logger(args):
         f"{args.name}_{args.log_prefix}{now.month:02d}_{now.day:02d}_{now.hour:03d}.txt"
     )
 
+    name = "detectron2"
     rank = comm.get_rank()
-    logger = setup_logger(output=logfile, distributed_rank=rank)
+
+    if not fileonly:
+        logger = setup_logger(output=logfile, distributed_rank=rank, name=name)
+    else:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.DEBUG)
+
+        if rank == 0:
+            fh = logging.FileHandler(logfile, mode='w')
+            fh.setLevel(logging.DEBUG)
+            plain_formatter = logging.Formatter(
+                "%(asctime)s %(name)s | %(message)s")
+            fh.setFormatter(plain_formatter)
+            logger.addHandler(fh)
+            rich.print(f"[red]Log to {logfile}[/red]")
+
     return logger
-
-
-def custom_setup(args):
-    rank = comm.get_rank()
-    logger = configure_logger(args)
-    logger.info("Rank of current process: {}. World size: {}".format(
-        rank, comm.get_world_size()))
-    seed_all_rng(None if args.seed < 0 else args.seed + rank)
-
-    # cudnn benchmark has large overhead. It shouldn't be used considering the small size of
-    # typical validation set.
-    if not (hasattr(args, "eval_only") and args.eval_only):
-        torch.backends.cudnn.benchmark = args.benchmark
 
 
 def visualize_det2(dataset_dicts: List[dict],

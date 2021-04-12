@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List
 
-from utils.utils_det import configure_logger, custom_setup
+from utils.utils_det import configure_logger
 from detectron2.data.catalog import MetadataCatalog
 import hydra
 from detectron2 import model_zoo
@@ -21,7 +21,7 @@ from detectron2.data import transforms as T
 
 from data_loading import conflab_dataset
 from utils import visualize_det2, create_train_augmentation, create_test_augmentation
-
+import rich
 import logging
 logger = logging.getLogger("detectron2")
 
@@ -45,7 +45,8 @@ class Trainer(DefaultTrainer):
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
-        return COCOEvaluator(dataset_name, ("bbox", "keypoints"),
+        return COCOEvaluator(dataset_name,
+                             cfg.TASKS,
                              False,
                              output_dir=output_folder)
 
@@ -72,6 +73,8 @@ def setup(args):
     cfg.image_w = args.size[0]
     cfg.image_h = args.size[1]
 
+    cfg.TASKS = tuple(args.eval_task)
+
     if args.eval_only is False:
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
         cfg.SOLVER.IMS_PER_BATCH = args.batch_size
@@ -95,7 +98,8 @@ def setup(args):
         logger.debug(f"load checkpoint from {args.checkpoint}")
         cfg.MODEL.WEIGHTS = os.path.expanduser(args.checkpoint)
 
-    # default_setup(cfg, args)
+    if args.eval_only is False:
+        default_setup(cfg, args)
 
     return cfg
 
@@ -104,18 +108,19 @@ def main(args):
     # register dataset
     conflab_dataset.register_conflab_dataset(args)
 
-    # setup logger
-    custom_setup(args)
-
     cfg = setup(args)
 
     if args.eval_only is False:
-        trainer = Trainer(cfg)
+        configure_logger(args, fileonly=True)
 
+        trainer = Trainer(cfg)
         trainer.resume_or_load(resume=args.resume)
         trainer.train()
 
     else:
+        # setup logger
+        configure_logger(args)
+
         if args.visualize is False:
             model = Trainer.build_model(cfg)
             DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
@@ -137,8 +142,8 @@ def hydra_main(args: DictConfig):
 
     args = OmegaConf.create(OmegaConf.to_yaml(args, resolve=True))
 
-    print("Command Line Args:\n{}".format(OmegaConf.to_yaml(args,
-                                                            resolve=True)))
+    rich.print("Command Line Args:\n{}".format(
+        OmegaConf.to_yaml(args, resolve=True)))
 
     if args.create_coco:
         return
@@ -152,5 +157,4 @@ def hydra_main(args: DictConfig):
 
 
 if __name__ == "__main__":
-
     hydra_main()

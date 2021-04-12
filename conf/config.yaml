@@ -19,9 +19,8 @@ create_coco: false
 coco_json_path: "store/conflab_coco.json"
 coco_json_path_train: "store/conflab_coco_train.json"
 coco_json_path_test: "store/conflab_coco_test.json"
-train_split: 0.8
 test_cam:
-  - cam6
+  - cam6 # use camera 6 as test camera
 
 # model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
 # model_zoo_weights: "https://dl.fbaipublicfiles.com/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/137849621/model_final_a6e10b.pkl"
@@ -48,8 +47,8 @@ total_ann: null
 # num_items: 10
 
 batch_size: 2
-max_iters: 5000
-learning_rate: 0.0005
+max_iters: 50000
+learning_rate: 0.002
 
 roi_thresh: 0.5
 
