@@ -1,8 +1,8 @@
 import os
 from typing import Dict, List
-from utils.utils_det import configure_logger
+
+from utils.utils_det import configure_logger, custom_setup
 from detectron2.data.catalog import MetadataCatalog
-from loguru import logger
 import hydra
 from detectron2 import model_zoo
 from omegaconf import OmegaConf, DictConfig
@@ -18,10 +18,12 @@ from detectron2.data import (DatasetCatalog, DatasetMapper,
 
 from detectron2.engine import DefaultTrainer, launch, default_setup, DefaultPredictor
 from detectron2.data import transforms as T
-import tqdm
 
 from data_loading import conflab_dataset
 from utils import visualize_det2, create_train_augmentation, create_test_augmentation
+
+import logging
+logger = logging.getLogger("detectron2")
 
 
 class Trainer(DefaultTrainer):
@@ -93,11 +95,18 @@ def setup(args):
         logger.debug(f"load checkpoint from {args.checkpoint}")
         cfg.MODEL.WEIGHTS = os.path.expanduser(args.checkpoint)
 
-    default_setup(cfg, args)
+    # default_setup(cfg, args)
+
     return cfg
 
 
 def main(args):
+    # register dataset
+    conflab_dataset.register_conflab_dataset(args)
+
+    # setup logger
+    custom_setup(args)
+
     cfg = setup(args)
 
     if args.eval_only is False:
@@ -126,16 +135,20 @@ def main(args):
 @hydra.main(config_name='config', config_path='conf')
 def hydra_main(args: DictConfig):
 
-    configure_logger(args)
+    args = OmegaConf.create(OmegaConf.to_yaml(args, resolve=True))
 
-    logger.info("Command Line Args:\n{}".format(
-        OmegaConf.to_yaml(args, resolve=True)))
-    conflab_dataset.register_conflab_dataset(args)
+    print("Command Line Args:\n{}".format(OmegaConf.to_yaml(args,
+                                                            resolve=True)))
 
     if args.create_coco:
         return
 
-    launch(main, args.num_gpus, args=(args, ))
+    launch(main,
+           args.num_gpus,
+           machine_rank=args.machine_rank,
+           num_machines=args.num_machines,
+           dist_url=args.dist_url,
+           args=(args, ))
 
 
 if __name__ == "__main__":

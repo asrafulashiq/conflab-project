@@ -1,5 +1,4 @@
 from collections import defaultdict
-from loguru import logger
 from typing import Dict, List, Mapping, Tuple
 import numpy as np
 import json
@@ -7,6 +6,10 @@ import parse
 import seaborn as sns
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.model_selection import train_test_split
+
+import logging
+
+logger = logging.getLogger("detectron2")
 
 
 def extract_file_info(filename: str) -> Mapping:

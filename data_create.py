@@ -3,7 +3,7 @@ import os
 from utils.utils_det import configure_logger
 import hydra
 import cv2
-from loguru import logger
+
 import random
 from detectron2.data import DatasetCatalog, MetadataCatalog
 from data_loading.conflab_dataset import *
@@ -18,8 +18,8 @@ def main(args):
     register_conflab_dataset(args)
 
     if args.data_plot:
-        dataset_dicts: List[Dict] = DatasetCatalog.get(args.dataset)
-        metadata = MetadataCatalog.get(args.dataset)
+        dataset_dicts: List[Dict] = DatasetCatalog.get(args.test_dataset)
+        metadata = MetadataCatalog.get(args.test_dataset)
         samples = random.sample(
             dataset_dicts, min(args.data_create_num_vis, len(dataset_dicts)))
         for d in tqdm(samples):

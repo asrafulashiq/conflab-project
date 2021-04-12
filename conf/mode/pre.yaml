@@ -1,0 +1,9 @@
+# @package _global_
+
+meta_dataset: "coco_2014_val"
+
+eval_only: true
+pretrained: true
+resume: false
+
+visualize: false

@@ -3,11 +3,13 @@ from PIL import Image
 import os
 import json
 from tqdm import tqdm
-from loguru import logger
 from omegaconf import DictConfig
 from detectron2.data import MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
 from data_loading.utils import *
+
+import logging
+logger = logging.getLogger("detectron2")
 
 
 def convert_conflab_to_coco(img_root_dir: str,
