@@ -108,6 +108,9 @@ def main(args):
     # register dataset
     conflab_dataset.register_conflab_dataset(args)
 
+    if args.create_coco:
+        return
+
     cfg = setup(args)
 
     if args.eval_only is False:
@@ -144,9 +147,6 @@ def hydra_main(args: DictConfig):
 
     rich.print("Command Line Args:\n{}".format(
         OmegaConf.to_yaml(args, resolve=True)))
-
-    if args.create_coco:
-        return
 
     launch(main,
            args.num_gpus,
