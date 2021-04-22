@@ -23,3 +23,5 @@ datasets
 store/**
 figs/**
 logs/**
+
+!requirements.txt
