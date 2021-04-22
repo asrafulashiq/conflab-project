@@ -7,10 +7,17 @@ Data Cleaning:
 Train:
   ☐ perform hyper-parameter tuning
 
+Todo:
+  ☐ There will be two investigative experiments (ablations) characterizing the following: 
+    + performance affected by increasingly more annotated data, 
+    + performance affected by adding more keypoints to the task. This could be 3/4 splits: head+shoulders, head+shoulders+arms, head+shoulder+arms+pelvis&hips, full body. 
+
+  ☐ For ablation on keypoints vs performance, the following grouping will be okay:
+    Centre of head, nose, right shoulder, left shoulder, neck 
+    + right and left elbow, right and left wrist 
+    + right and left hip  
+    + left and right knee +  left and right ankles, left and right toes
 
 
 Important command:
   - `python data_create.py create_coco=true [+debug=default]`
-
-
-
