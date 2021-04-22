@@ -14,6 +14,11 @@ pip install requirements.txt
 
 ## Dataset
 
+create dataset by:
+```
+python main.py create_coco=true
+```
+
 ## Training
 
 ## Evaluation
