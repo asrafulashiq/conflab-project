@@ -8,6 +8,7 @@ import uuid
 from pathlib import Path
 from omegaconf.dictconfig import DictConfig
 import submitit
+import rich
 
 
 def get_shared_folder() -> Path:
@@ -99,7 +100,7 @@ def submitit_main(args: DictConfig):
 
     print("_" * 60)
     print("_" * 60)
-    print("job_id :", job.job_id)
-    print("sbatch script : ", job.paths.submission_file)
-    print("stderr : ", job.paths.stderr)
-    print("stdout : ", job.paths.stdout)
+    rich.print("job_id :", job.job_id)
+    rich.print("sbatch script : ", job.paths.submission_file)
+    rich.print("stderr : ", job.paths.stderr)
+    rich.print("stdout : ", job.paths.stdout)

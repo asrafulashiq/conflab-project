@@ -76,10 +76,14 @@ total_ann_per_file: null
 # ddp
 machine_rank: 0
 num_machines: 1
-
-world_size: 1
-dist_url: "env://" #"tcp://127.0.0.1:3200"
 num_gpus: 1
+
+dist_url: "env://" #"tcp://127.0.0.1:3200"
+
+gpu: 1
+rank: 0
+world_size: 1
+
 seed: 0
 benchmark: false
 accelerator: "ddp" # "ddp_spawn"
