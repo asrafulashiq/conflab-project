@@ -1,18 +1,22 @@
-# python main.py mode=train name=kp_R50_FPN_ITR_2e4 num_gpus=2 max_iters=20000
+launcher="local"
+while getopts "l:" opt; do
+    case ${opt} in
+    l)
+        launcher="$OPTARG"
+        ;;
+    esac
+done
 
-# python main.py mode=train name=kp_R50_FPN_LR_0.02_ITR_2e4 num_gpus=2 learning_rate=0.02 max_iters=20000
+for each_split in $(ls ./data_loading/splits/); do
 
-# python main.py mode=train name=kp_R50_FPN_LR_0.002_ITR_2e4 num_gpus=2 learning_rate=0.002 max_iters=20000
+    if [ $launcher = "slurm" ]; then
+        LAUNCHER="launcher=slurm ngpus=4 timeout=06:00:00 mem_per_cpu=10000 cpus_per_task=6"
+    fi
 
-# python main.py mode=train name=kp_R50_FPN_LR_0.002_ITR_5e4 num_gpus=2 learning_rate=0.002 max_iters=50000
-
-names=(kp_R50_FPN_ITR_2e4 kp_R50_FPN_LR_0.02_ITR_2e4 kp_R50_FPN_LR_0.002_ITR_2e4 kp_R50_FPN_LR_0.002_ITR_5e4)
-
-for name in "${names[@]}"; do
-
-    # python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py \
-    #     mode=test name=eval_kp_R50_FPN_ITR_2e4 checkpoint="ckpt/${name}/model_final.pth"
-
-    python main.py mode=test name=eval_kp_R50_FPN_ITR_2e4 checkpoint="ckpt/${name}/model_final.pth"
+    base_name=$(cut -d'.' -f1 <<<"${each_split}")
+    cmd="python main.py split_path=data_loading/splits/${each_split} \
+        coco_json_prefix=${each_split} name=kp_${base_name} ${LAUNCHER}"
+    echo $cmd
+    eval $cmd
 
 done

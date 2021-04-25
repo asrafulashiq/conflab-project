@@ -63,7 +63,7 @@ def init_distributed_mode(args):
 
     args.distributed = True
 
-    print(os.environ)
+    # print(os.environ)
     os.environ["RANK"] = f"{args.rank}"
     os.environ['WORLD_SIZE'] = f"{args.world_size}"
     os.environ['LOCAL_RANK'] = f"{args.gpu}"
