@@ -19,5 +19,8 @@ Todo:
     + left and right knee +  left and right ankles, left and right toes
 
 
+Progress:
+  ☐ bash scripts/script_ablation.sh @started(21-04-25 18:10)
+
 Important command:
   - `python data_create.py create_coco=true [+debug=default]`
