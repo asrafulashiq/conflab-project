@@ -18,7 +18,7 @@ for each_split in $(ls ./data_loading/splits/); do
     fi
 
     cmd="python main.py create_coco=true split_path=data_loading/splits/${each_split} \
-        coco_json_prefix=${each_split} name=data_each_split ${LAUNCHER}"
+        coco_json_prefix=${each_split} name=data_${each_split} ${LAUNCHER}"
     echo $cmd
     eval $cmd
 
