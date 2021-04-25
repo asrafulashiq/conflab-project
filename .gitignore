@@ -24,4 +24,6 @@ store/**
 figs/**
 logs/**
 
+checkpoint
+
 !requirements.txt

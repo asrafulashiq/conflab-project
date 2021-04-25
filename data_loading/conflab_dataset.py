@@ -75,7 +75,7 @@ def convert_conflab_to_coco(img_root_dir: str,
 
                 record_ann = {}
                 record_ann["id"] = counter
-                record_ann["imcocosplit.age_id"] = dict_ims[filename]["id"]
+                record_ann["image_id"] = dict_ims[filename]["id"]
                 record_ann["category_id"] = 1  # NOTE: person category
 
                 null_values = [x is None for x in anno["keypoints"]]
@@ -115,22 +115,35 @@ def convert_conflab_to_coco(img_root_dir: str,
 
 
 def register_conflab_dataset(args: DictConfig):
-    if args.create_coco:
-        # convert to coco
-        coco_info = convert_conflab_to_coco(img_root_dir=args.img_root_dir,
-                                            annotation_dir=args.ann_dir,
-                                            total_ann=args.total_ann_per_file,
-                                            thresh_null=args.thresh_null_kp)
 
-        Path(args.coco_json_path).parent.mkdir(exist_ok=True, parents=True)
-        with open(args.coco_json_path, "w") as fp:
-            json.dump(coco_info, fp, indent=2)
+    if args.split_path:
+        import json
+        with open(args.split_path, 'r') as fp:
+            split_info = json.load(fp)
+        args.train_cam = split_info['train_cam']
+        args.test_cam = split_info['test_cam']
+
+    if args.create_coco:
+        convert_to_coco = (not os.path.exists(
+            args.coco_json_path)) or args.force_register
+        # convert to coco
+        if convert_to_coco:
+            coco_info = convert_conflab_to_coco(
+                img_root_dir=args.img_root_dir,
+                annotation_dir=args.ann_dir,
+                total_ann=args.total_ann_per_file,
+                thresh_null=args.thresh_null_kp)
+
+            Path(args.coco_json_path).parent.mkdir(exist_ok=True, parents=True)
+            with open(args.coco_json_path, "w") as fp:
+                json.dump(coco_info, fp, indent=2)
 
         logger.info("splitting coco dataset")
         coco_split(args.coco_json_path,
                    args.coco_json_path_train,
                    args.coco_json_path_test,
-                   test_cam=args.test_cam)
+                   test_cam=args.test_cam,
+                   train_cam=args.train_cam)
 
     keypoints, keypoint_connection_rules, keypoint_flip_map = get_kp_names()
 

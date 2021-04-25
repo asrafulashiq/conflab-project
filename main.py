@@ -23,6 +23,7 @@ from data_loading import conflab_dataset
 from utils import visualize_det2, create_train_augmentation, create_test_augmentation
 import rich
 import logging
+
 logger = logging.getLogger("detectron2")
 
 
@@ -87,7 +88,6 @@ def setup(args):
     else:
         if args.pretrained:
             cfg.MODEL.WEIGHTS = args.model_zoo_weights
-            #model_zoo.get_checkpoint_url(args.model_zoo)
         else:
             cfg.MODEL.WEIGHTS = os.path.join(
                 cfg.OUTPUT_DIR,
@@ -104,11 +104,17 @@ def setup(args):
     return cfg
 
 
-def main(args):
+def main(args: DictConfig):
+    args = OmegaConf.create(OmegaConf.to_yaml(args, resolve=True))
+
+    rich.print("Command Line Args:\n{}".format(
+        OmegaConf.to_yaml(args, resolve=True)))
+
     # register dataset
     conflab_dataset.register_conflab_dataset(args)
 
     if args.create_coco:
+        # only create dataset
         return
 
     cfg = setup(args)
@@ -142,12 +148,6 @@ def main(args):
 
 @hydra.main(config_name='config', config_path='conf')
 def hydra_main(args: DictConfig):
-
-    args = OmegaConf.create(OmegaConf.to_yaml(args, resolve=True))
-
-    rich.print("Command Line Args:\n{}".format(
-        OmegaConf.to_yaml(args, resolve=True)))
-
     launch(main,
            args.num_gpus,
            machine_rank=args.machine_rank,

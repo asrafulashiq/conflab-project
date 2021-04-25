@@ -17,11 +17,11 @@ def parse_args():
     parser = argparse.ArgumentParser("Submitit for DeiT",
                                      parents=[classification_parser])
     parser.add_argument("--ngpus",
-                        default=8,
+                        default=1,
                         type=int,
                         help="Number of gpus to request on each node")
     parser.add_argument("--nodes",
-                        default=2,
+                        default=1,
                         type=int,
                         help="Number of nodes to request")
     parser.add_argument("--timeout",
@@ -32,17 +32,7 @@ def parse_args():
                         default="",
                         type=str,
                         help="Job dir. Leave empty for automatic.")
-    parser.add_argument("--job_name",
-                        default="deit",
-                        type=str,
-                        help="Job name")
-    parser.add_argument("--partition",
-                        default="learnfair",
-                        type=str,
-                        help="Partition where to submit")
-    parser.add_argument("--use_volta32",
-                        action='store_true',
-                        help="Big models? Use this")
+    parser.add_argument("--job_name", default="tmp", type=str, help="Job name")
     parser.add_argument(
         '--comment',
         default="",
@@ -109,7 +99,7 @@ class Trainer(object):
 def main():
     args = parse_args()
     if args.job_dir == "":
-        args.job_dir = get_shared_folder() / "%j"
+        args.job_dir = get_shared_folder() / args.job_name / "%j"
 
     # Note that the folder will depend on the job_id, to easily track experiments
     executor = submitit.AutoExecutor(folder=args.job_dir,

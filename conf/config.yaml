@@ -16,11 +16,23 @@ img_root_dir: "${env:HOME}/datasets/conflab-mm/frames/videoSegments"
 ann_dir: "${env:HOME}/datasets/conflab-mm/pose"
 
 create_coco: false
+force_register: false # NOTE fore re-register
+
 coco_json_path: "store/conflab_coco.json"
-coco_json_path_train: "store/conflab_coco_train.json"
-coco_json_path_test: "store/conflab_coco_test.json"
+
+split_path: ""
+coco_json_prefix: ""
+coco_json_path_train: "store/conflab_coco_train_${coco_json_prefix}.json"
+coco_json_path_test: "store/conflab_coco_test_${coco_json_prefix}.json"
+
 test_cam:
   - cam6 # use camera 6 as test camera
+
+train_cam:
+  - cam2
+  - cam4
+  - cam8
+  - cam10
 
 # model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
 # model_zoo_weights: "https://dl.fbaipublicfiles.com/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/137849621/model_final_a6e10b.pkl"

@@ -250,7 +250,11 @@ def filter_annotations(annotations, images):
     return list(filter(lambda a: int(a['image_id']) in image_ids, annotations))
 
 
-def coco_split(annotation_file, train_file, test_file, test_cam=["cam6"]):
+def coco_split(annotation_file: str,
+               train_file: str,
+               test_file: str,
+               test_cam: List[str] = ["cam6"],
+               train_cam: List[str] = ["cam8"]):
     with open(annotation_file, 'r', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
 
@@ -267,19 +271,17 @@ def coco_split(annotation_file, train_file, test_file, test_cam=["cam6"]):
         for im in images:
             if any(im['file_name'].startswith(x) for x in test_cam):
                 images_test.append(im)
-            else:
+            elif any(im['file_name'].startswith(x) for x in train_cam):
                 images_train.append(im)
-        logger.info("splitted images")
-
-        # x, y = train_test_split(images, train_size=split)
+        logger.info("splitting images...")
 
         save_coco(train_file, info, licenses, images_train,
                   filter_annotations(annotations, images_train), categories)
-        logger.info("saved train json")
+        logger.info(f"saved train to {train_file}")
 
         save_coco(test_file, info, licenses, images_test,
                   filter_annotations(annotations, images_test), categories)
-        logger.info("saved test json")
+        logger.info(f"saved test to {test_file}")
 
         print("Saved {} entries in {} and {} in {}".format(
             len(images_train), train_file, len(images_test), test_file))
