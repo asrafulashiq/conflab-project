@@ -62,7 +62,7 @@ class Trainer(object):
 
 
 def submitit_main(args: DictConfig):
-    if args.job_name:
+    if not args.job_name:
         args.job_name = args.name
 
     if args.job_dir == "":
