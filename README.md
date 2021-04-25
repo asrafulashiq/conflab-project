@@ -21,6 +21,10 @@ python main.py create_coco=true
 
 ## Training
 
+```
+python main.py mode=test name=kp_main
+```
+
 ## Evaluation
 
 ### Evaluation on COCO-pretrained Model

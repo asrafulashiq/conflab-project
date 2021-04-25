@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 from detectron2.data import MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
 from data_loading.utils import *
-
+from pathlib import Path
 import logging
 logger = logging.getLogger("detectron2")
 
@@ -121,6 +121,8 @@ def register_conflab_dataset(args: DictConfig):
                                             annotation_dir=args.ann_dir,
                                             total_ann=args.total_ann_per_file,
                                             thresh_null=args.thresh_null_kp)
+
+        Path(args.coco_json_path).parent.mkdir(exist_ok=True, parents=True)
         with open(args.coco_json_path, "w") as fp:
             json.dump(coco_info, fp, indent=2)
 
