@@ -6,6 +6,7 @@ defaults:
   - task: keypoint
   - zoo: ${task}_R50_FPN
 
+  - launcher: local
   - override hydra/hydra_logging: none
   - override hydra/job_logging: none
 
