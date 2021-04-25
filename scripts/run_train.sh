@@ -10,6 +10,9 @@ names=(kp_R50_FPN_ITR_2e4 kp_R50_FPN_LR_0.02_ITR_2e4 kp_R50_FPN_LR_0.002_ITR_2e4
 
 for name in "${names[@]}"; do
 
+    # python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py \
+    #     mode=test name=eval_kp_R50_FPN_ITR_2e4 checkpoint="ckpt/${name}/model_final.pth"
+
     python main.py mode=test name=eval_kp_R50_FPN_ITR_2e4 checkpoint="ckpt/${name}/model_final.pth"
 
 done

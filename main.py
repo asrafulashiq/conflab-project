@@ -20,7 +20,7 @@ from detectron2.engine import DefaultTrainer, launch, default_setup, DefaultPred
 from detectron2.data import transforms as T
 
 from data_loading import conflab_dataset
-from utils import visualize_det2, create_train_augmentation, create_test_augmentation
+from utils import utils_dist, visualize_det2, create_train_augmentation, create_test_augmentation
 import rich
 import logging
 
@@ -110,6 +110,9 @@ def main(args: DictConfig):
     rich.print("Command Line Args:\n{}".format(
         OmegaConf.to_yaml(args, resolve=True)))
 
+    if args.accelerator == "ddp":
+        utils_dist.init_distributed_mode(args)
+
     # register dataset
     conflab_dataset.register_conflab_dataset(args)
 
@@ -147,6 +150,7 @@ def main(args: DictConfig):
 
 
 def main_launcher(args: DictConfig):
+    # ddp spawn
     launch(main,
            args.num_gpus,
            machine_rank=args.machine_rank,
@@ -158,7 +162,11 @@ def main_launcher(args: DictConfig):
 @hydra.main(config_name='config', config_path='conf')
 def hydra_main(args: DictConfig):
     if args.launcher_name == "local":
-        main_launcher(args)
+        if args.accelerator == "ddp":
+            main(args)
+        else:
+            args.dist_url = "auto"
+            main_launcher(args)
     elif args.launcher_name == "slurm":
         from utils.utils_slurm import submitit_main
         submitit_main(args)
