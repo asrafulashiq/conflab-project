@@ -35,8 +35,8 @@ class Trainer(object):
     def __call__(self):
         import main as detection
 
-        # self._setup_gpu_args()
-        detection.main_launcher(self.args)
+        self._setup_gpu_args()
+        detection.main(self.args)
 
     def checkpoint(self):
 
@@ -46,19 +46,19 @@ class Trainer(object):
         empty_trainer = type(self)(self.args)
         return submitit.helpers.DelayedSubmission(empty_trainer)
 
-    # def _setup_gpu_args(self):
-    #     import submitit
-    #     from pathlib import Path
+    def _setup_gpu_args(self):
+        import submitit
+        # from pathlib import Path
 
-    #     job_env = submitit.JobEnvironment()
-    #     # self.args.output_dir = Path(
-    #     #     str(self.args.output_dir).replace("%j", str(job_env.job_id)))
-    #     # self.args.gpu = job_env.local_rank
-    #     # self.args.rank = job_env.global_rank
-    #     # self.args.world_size = job_env.num_tasks
-    #     print(
-    #         f"Process group: {job_env.num_tasks} tasks, rank: {job_env.global_rank}"
-    #     )
+        job_env = submitit.JobEnvironment()
+        # self.args.output_dir = Path(
+        #     str(self.args.output_dir).replace("%j", str(job_env.job_id)))
+        self.args.gpu = job_env.local_rank
+        self.args.rank = job_env.global_rank
+        self.args.world_size = job_env.num_tasks
+        print(
+            f"Process group: {job_env.num_tasks} tasks, rank: {job_env.global_rank}"
+        )
 
 
 def submitit_main(args: DictConfig):
@@ -81,16 +81,17 @@ def submitit_main(args: DictConfig):
     }
 
     executor.update_parameters(job_name=args.job_name,
-                               mem_per_cpu=10000,
+                               mem_per_cpu=args.mem_per_cpu,
                                num_gpus=num_gpus_per_node,
                                ntasks_per_node=num_gpus_per_node,
-                               cpus_per_task=10,
+                               cpus_per_task=args.cpus_per_task,
                                nodes=nodes,
                                time=args.timeout,
                                slurm_signal_delay_s=120,
                                **kwargs)
 
     args.dist_url = get_init_file().as_uri()
+    args.accelerator = 'ddp'
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     trainer = Trainer(args)

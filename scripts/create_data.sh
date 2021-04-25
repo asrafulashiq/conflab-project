@@ -14,7 +14,7 @@ done
 for each_split in $(ls ./data_loading/splits/); do
 
     if [ $launcher = "slurm" ]; then
-        LAUNCHER="ngpus=0 timeout=00:30:00"
+        LAUNCHER="launcher=slurm ngpus=1 timeout=01:00:00 mem_per_cpu=20000 cpus_per_task=2"
     fi
 
     cmd="python main.py create_coco=true split_path=data_loading/splits/${each_split} \

@@ -5,8 +5,7 @@ import json
 import parse
 import seaborn as sns
 from sklearn.metrics.pairwise import euclidean_distances
-from sklearn.model_selection import train_test_split
-
+from tqdm import tqdm
 import logging
 
 logger = logging.getLogger("detectron2")
@@ -247,7 +246,13 @@ def save_coco(file, info, licenses, images, annotations, categories):
 
 def filter_annotations(annotations, images):
     image_ids = set(map(lambda i: int(i['id']), images))
-    return list(filter(lambda a: int(a['image_id']) in image_ids, annotations))
+
+    _list = []
+    for ann in tqdm(annotations):
+        if int(ann['image_id']) in image_ids:
+            _list.append(ann)
+    return _list
+    # return list(filter(lambda a: int(a['image_id']) in image_ids, annotations))
 
 
 def coco_split(annotation_file: str,
