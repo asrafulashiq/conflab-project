@@ -62,6 +62,9 @@ class Trainer(object):
 
 
 def submitit_main(args: DictConfig):
+    if args.job_name:
+        args.job_name = args.name
+
     if args.job_dir == "":
         args.job_dir = get_shared_folder() / args.job_name / "%j"
 
