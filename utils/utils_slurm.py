@@ -40,7 +40,7 @@ class Trainer(object):
 
     def checkpoint(self):
 
-        self.args.dist_url = get_init_file().as_uri()
+        self.args.dist_url = str(get_init_file().as_uri())
         self.args.resume = True
         print("Requeuing ", self.args)
         empty_trainer = type(self)(self.args)
@@ -66,7 +66,7 @@ def submitit_main(args: DictConfig):
         args.job_name = args.name
 
     if args.job_dir == "":
-        args.job_dir = get_shared_folder() / args.job_name / "%j"
+        args.job_dir = str(get_shared_folder() / args.job_name / "%j")
 
     # Note that the folder will depend on the job_id, to easily track experiments
     executor = submitit.AutoExecutor(folder=args.job_dir,
