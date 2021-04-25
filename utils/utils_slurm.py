@@ -12,11 +12,11 @@ import submitit
 
 def get_shared_folder() -> Path:
     user = os.getenv("USER")
-    if Path(f"{os.getcwd()}/checkpoint/").is_dir():
-        p = Path(f"{os.getcwd()}/checkpoint/{user}/experiments")
-        p.mkdir(exist_ok=True, parents=True)
-        return p
-    raise RuntimeError("No shared folder available")
+    # if Path(f"{os.getcwd()}/checkpoint/").is_dir():
+    p = Path(f"{os.getcwd()}/checkpoint/{user}/experiments")
+    p.mkdir(exist_ok=True, parents=True)
+    return p
+    # raise RuntimeError("No shared folder available")
 
 
 def get_init_file():

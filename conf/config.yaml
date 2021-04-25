@@ -48,7 +48,7 @@ test_dataset: ${dataset}_test
 log_dir: "logs"
 log_prefix: ""
 
-num_workers: 4
+num_workers: 6
 num_classes: 1
 
 total_ann: null
@@ -59,7 +59,7 @@ total_ann: null
 # visualize: false
 # num_items: 10
 
-batch_size: 2
+batch_size: 4
 max_iters: 50000
 learning_rate: 0.002
 

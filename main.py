@@ -149,7 +149,7 @@ def main(args: DictConfig):
                            vis_conf=args.vis)
 
 
-def main_launcher(args: DictConfig):
+def main_spawn(args: DictConfig):
     # ddp spawn
     launch(main,
            args.num_gpus,
@@ -166,7 +166,7 @@ def hydra_main(args: DictConfig):
             main(args)
         else:
             args.dist_url = "auto"
-            main_launcher(args)
+            main_spawn(args)
     elif args.launcher_name == "slurm":
         from utils.utils_slurm import submitit_main
         submitit_main(args)
