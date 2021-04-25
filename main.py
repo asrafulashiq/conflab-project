@@ -76,6 +76,8 @@ def setup(args):
 
     cfg.TASKS = tuple(args.eval_task)
 
+    cfg.SOLVER.REFERENCE_WORLD_SIZE = 1
+
     if args.eval_only is False:
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
         cfg.SOLVER.IMS_PER_BATCH = args.batch_size
