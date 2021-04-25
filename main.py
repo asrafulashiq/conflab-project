@@ -146,14 +146,22 @@ def main(args: DictConfig):
                            vis_conf=args.vis)
 
 
-@hydra.main(config_name='config', config_path='conf')
-def hydra_main(args: DictConfig):
+def main_launcher(args: DictConfig):
     launch(main,
            args.num_gpus,
            machine_rank=args.machine_rank,
            num_machines=args.num_machines,
            dist_url=args.dist_url,
            args=(args, ))
+
+
+@hydra.main(config_name='config', config_path='conf')
+def hydra_main(args: DictConfig):
+    if args.launcher_name == "local":
+        main_launcher(args)
+    elif args.launcher_name == "slurm":
+        from utils.utils_slurm import submitit_main
+        submitit_main(args)
 
 
 if __name__ == "__main__":

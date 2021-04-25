@@ -9,6 +9,8 @@ from detectron2.data.datasets import register_coco_instances
 from data_loading.utils import *
 from pathlib import Path
 import logging
+import json
+
 logger = logging.getLogger("detectron2")
 
 
@@ -117,7 +119,6 @@ def convert_conflab_to_coco(img_root_dir: str,
 def register_conflab_dataset(args: DictConfig):
 
     if args.split_path:
-        import json
         with open(args.split_path, 'r') as fp:
             split_info = json.load(fp)
         args.train_cam = split_info['train_cam']
