@@ -35,9 +35,6 @@ train_cam:
   - cam8
   - cam10
 
-# model_zoo: "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
-# model_zoo_weights: "https://dl.fbaipublicfiles.com/detectron2/COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x/137849621/model_final_a6e10b.pkl"
-
 name: "kp_base"
 output_dir: "./ckpt/${name}"
 checkpoint: null # whether to load any pretrained checkpoint
@@ -61,7 +58,7 @@ total_ann: null
 
 batch_size: 4
 max_iters: 50000
-learning_rate: 0.002
+learning_rate: 0.02
 
 roi_thresh: 0.5
 
@@ -73,20 +70,21 @@ data_create_num_vis: 10
 data_plot: false
 total_ann_per_file: null
 
-# ddp
+# ddp_spawn
 machine_rank: 0
 num_machines: 1
 num_gpus: 1
 
 dist_url: "env://" #"tcp://127.0.0.1:3200"
 
+# ddp
 gpu: 1
 rank: 0
 world_size: 1
+accelerator: "ddp" # "ddp_spawn"
 
 seed: 0
 benchmark: false
-accelerator: "ddp" # "ddp_spawn"
 
 hydra:
   run:
