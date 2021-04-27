@@ -116,13 +116,16 @@ def convert_conflab_to_coco(img_root_dir: str,
     return coco_data
 
 
-def register_conflab_dataset(args: DictConfig):
+def register_conflab_dataset(args: DictConfig) -> None:
 
     if args.split_path:
         with open(args.split_path, 'r') as fp:
             split_info = json.load(fp)
         args.train_cam = split_info['train_cam']
         args.test_cam = split_info['test_cam']
+
+    keypoints, keypoint_connection_rules, keypoint_flip_map, kp_indices = get_keypoints(
+        args.kp_rank)
 
     if args.create_coco:
         convert_to_coco = (not os.path.exists(
@@ -144,9 +147,8 @@ def register_conflab_dataset(args: DictConfig):
                    args.coco_json_path_train,
                    args.coco_json_path_test,
                    test_cam=args.test_cam,
-                   train_cam=args.train_cam)
-
-    keypoints, keypoint_connection_rules, keypoint_flip_map = get_kp_names()
+                   train_cam=args.train_cam,
+                   filter_kp_ids=kp_indices)
 
     def _register(dataset, ann_path):
         register_coco_instances(dataset, {}, ann_path, args.img_root_dir)

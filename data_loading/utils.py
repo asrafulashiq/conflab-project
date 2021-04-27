@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Mapping, Tuple
+from typing import Dict, List, Mapping, Optional, Set, Tuple
 import numpy as np
 import json
 import parse
@@ -116,13 +116,45 @@ def sanity_check_kp_bb(kps, bb):
             # raise ValueError("sanity check failed")
 
 
+KEYPOINTS = [
+    "head", "nose", "neck", "rightShoulder", "rightElbow", "rightWrist",
+    "leftShoulder", "leftElbow", "leftWrist", "rightHip", "rightKnee",
+    "rightAnkle", "leftHip", "leftKnee", "leftAnkle", "rightFoot", "leftFoot"
+]
+
+KEYPOINTS_1 = ["head", "nose", "neck", "rightShoulder", "leftShoulder"]
+KEYPOINTS_2 = [
+    "head", "nose", "neck", "rightShoulder", "leftShoulder", "rightElbow",
+    "rightWrist", "leftElbow", "leftWrist"
+]
+KEYPOINTS_3 = [
+    "head", "nose", "neck", "rightShoulder", "leftShoulder", "rightElbow",
+    "rightWrist", "leftElbow", "leftWrist", "rightHip", "leftHip"
+]
+
+
+def get_keypoints(rank: int = 0):
+    if not rank:
+        return get_kp_names()
+    keypoints, keypoint_connection_rules, keypoint_flip_map, _ = get_kp_names()
+    sm_keypoints = eval(f"KEYPOINTS_{rank}")
+    original_indices = [keypoints.index(x) for x in sm_keypoints]
+    # original_indices = list(idx_orig_to_now.keys())
+    sm_keypoint_connection_rules = []
+    for (a, b, c) in keypoint_connection_rules:
+        if a in original_indices and b in original_indices:
+            sm_keypoint_connection_rules.append((a, b, c))
+    sm_keypoint_flip_map = []
+    for a, b in keypoint_flip_map:
+        if a in sm_keypoints and b in sm_keypoints:
+            sm_keypoint_flip_map.append((a, b))
+
+    return (sm_keypoints, sm_keypoint_connection_rules, sm_keypoint_flip_map,
+            original_indices)
+
+
 def get_kp_names():
-    keypoints = [
-        "head", "nose", "neck", "rightShoulder", "rightElbow", "rightWrist",
-        "leftShoulder", "leftElbow", "leftWrist", "rightHip", "rightKnee",
-        "rightAnkle", "leftHip", "leftKnee", "leftAnkle", "rightFoot",
-        "leftFoot"
-    ]
+    keypoints = KEYPOINTS
     connections = [[0, 1], [0, 2], [2, 3], [2, 6], [3, 4], [4, 5], [6, 7],
                    [7, 8], [2, 9], [9, 10], [10, 11], [11, 15], [2, 12],
                    [12, 13], [13, 14], [14, 16]]
@@ -139,7 +171,7 @@ def get_kp_names():
                          ('leftKnee', 'rightKnee'), ('leftAnkle',
                                                      'rightAnkle'))
 
-    return keypoints, keypoint_connection_rules, keypoint_flip_map
+    return keypoints, keypoint_connection_rules, keypoint_flip_map, None
 
 
 class AnnStat(object):
@@ -244,22 +276,38 @@ def save_coco(file, info, licenses, images, annotations, categories):
             indent=2)
 
 
-def filter_annotations(annotations, images):
+def filter_annotations(annotations,
+                       images,
+                       filter_kp_ids: Optional[Set] = None):
     image_ids = set(map(lambda i: int(i['id']), images))
 
     _list = []
     for ann in tqdm(annotations):
         if int(ann['image_id']) in image_ids:
+            if filter_kp_ids:
+                ann = filter_keypoints(ann, filter_kp_ids)
             _list.append(ann)
     return _list
-    # return list(filter(lambda a: int(a['image_id']) in image_ids, annotations))
+
+
+def filter_keypoints(ann: dict, filter_ids: Set) -> dict:
+    keypoints = ann["keypoints"]
+
+    new_kp = []
+    for i, _ in enumerate(keypoints):
+        if (i // 3) in filter_ids:
+            new_kp.extend(keypoints[i // 3:i // 3 + 3])
+    ann["num_keypoints"] = len(new_kp[2::3])
+    ann["keypoints"] = new_kp
+    return ann
 
 
 def coco_split(annotation_file: str,
                train_file: str,
                test_file: str,
                test_cam: List[str] = ["cam6"],
-               train_cam: List[str] = ["cam8"]):
+               train_cam: List[str] = ["cam8"],
+               filter_kp_ids: Optional[Set] = None):
     with open(annotation_file, 'r', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
 
@@ -281,11 +329,13 @@ def coco_split(annotation_file: str,
         logger.info("splitting images...")
 
         save_coco(train_file, info, licenses, images_train,
-                  filter_annotations(annotations, images_train), categories)
+                  filter_annotations(annotations, images_train, filter_kp_ids),
+                  categories)
         logger.info(f"saved train to {train_file}")
 
         save_coco(test_file, info, licenses, images_test,
-                  filter_annotations(annotations, images_test), categories)
+                  filter_annotations(annotations, images_test, filter_kp_ids),
+                  categories)
         logger.info(f"saved test to {test_file}")
 
         print("Saved {} entries in {} and {} in {}".format(

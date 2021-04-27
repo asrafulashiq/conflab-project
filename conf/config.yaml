@@ -5,6 +5,7 @@ defaults:
   - mode: vis
   - task: keypoint
   - zoo: ${task}_R50_FPN
+  - split: none
 
   - launcher: local
   - override hydra/hydra_logging: none
@@ -23,8 +24,12 @@ coco_json_path: "store/conflab_coco.json"
 
 split_path: ""
 coco_json_prefix: ""
-coco_json_path_train: "store/conflab_coco_train${coco_json_prefix}.json"
-coco_json_path_test: "store/conflab_coco_test${coco_json_prefix}.json"
+
+# whether to use small keypoint
+kp_rank: "" # 1,2,3
+
+coco_json_path_train: "store/conflab_coco_train${coco_json_prefix}${kp_rank}.json"
+coco_json_path_test: "store/conflab_coco_test${coco_json_prefix}${kp_rank}.json"
 
 test_cam:
   - cam6 # use camera 6 as test camera
@@ -63,6 +68,8 @@ learning_rate: 0.02
 roi_thresh: 0.5
 
 size: [960, 540]
+size_test: ${size}
+half_crop: false
 
 # data creation
 thresh_null_kp: 0.1 # upper limit for null values: if less than 10% are null values, pick the image

@@ -77,14 +77,24 @@ def create_train_augmentation(cfg):
     augs = [
         T.Resize((cfg.image_h, cfg.image_w)),
         T.RandomBrightness(0.9, 1.1),
-        T.RandomFlip(prob=0.3)
-        # T.RandomCrop("absolute", (640, 640))
+        T.RandomFlip(prob=0.3),
     ]
+    if cfg.half_crop:
+        augs.insert(0, MyCustomCrop())
     return augs
 
 
 def create_test_augmentation(cfg):
     augs = [
-        T.Resize((cfg.image_h, cfg.image_w)),
+        T.ResizeShortestEdge(min(cfg.image_h_test, cfg.image_w_test)),
     ]
     return augs
+
+
+class MyCustomCrop(T.Augmentation):
+    def get_transform(self, image):
+        h, w = image.shape[:2]
+        croph, cropw = h, int(w // 2)
+        x0 = cropw
+        y0 = 0
+        return T.CropTransform(x0, y0, cropw, croph)

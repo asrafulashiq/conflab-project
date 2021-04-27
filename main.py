@@ -73,6 +73,9 @@ def setup(args):
     cfg.OUTPUT_DIR = args.output_dir
     cfg.image_w = args.size[0]
     cfg.image_h = args.size[1]
+    cfg.image_w_test = args.size_test[0]
+    cfg.image_h_test = args.size_test[1]
+    cfg.half_crop = args.half_crop
 
     cfg.TASKS = tuple(args.eval_task)
 
