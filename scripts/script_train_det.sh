@@ -1,7 +1,6 @@
 launcher="slurm"
-task=keypoint
+task=detection
 backbone=R50_FPN
-ranks=("0" "1" "2" "3")
 mode="train"
 while getopts "l:t:b:m:r:" opt; do
     case ${opt} in
@@ -27,11 +26,8 @@ if [ $launcher = "slurm" ]; then
     LAUNCHER="launcher=slurm ngpus=4 timeout=06:00:00 mem_per_cpu=10000 cpus_per_task=6"
 fi
 
-for rank in "${ranks[@]}"; do
-
-    zoo=${task}_${backbone}
-    cmd="python main.py mode=${mode} create_coco=true name=${zoo}_kr_${rank} \
-        task=${task} zoo=${zoo} ${LAUNCHER} kp_rank=${rank}"
-    echo $cmd
-    eval $cmd
-done
+zoo=${task}_${backbone}
+cmd="python main.py mode=${mode} create_coco=false name=${zoo} \
+        task=${task} zoo=${zoo} ${LAUNCHER}"
+echo $cmd
+eval $cmd

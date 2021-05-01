@@ -20,7 +20,13 @@ Todo:
 
 
 Progress:
-  ☐ bash scripts/script_ablation.sh @started(21-04-25 18:10)
+  ✔ bash scripts/script_ablation.sh @started(21-04-25 18:10) @done(21-05-01 18:11) @lasted(6d1m7s)
+  ☐ bash scripts/script_train.sh @started(21-05-01 18:12)
+  ☐ bash scripts/script_train.sh -b R101_FPN
+  ☐ bash scripts/script_train_det.sh 
+  ☐ bash scripts/script_train_det.sh -b R50_C4
+
+
 
 Important command:
   - `python data_create.py create_coco=true [+debug=default]`
