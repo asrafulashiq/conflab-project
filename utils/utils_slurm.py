@@ -75,6 +75,7 @@ def submitit_main(args: DictConfig):
 
     num_gpus_per_node = args.ngpus
     nodes = args.nodes
+    # args.gpus = args.ngpus
 
     kwargs = {
         "additional_parameters":

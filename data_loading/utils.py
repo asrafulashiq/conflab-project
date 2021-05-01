@@ -134,7 +134,7 @@ KEYPOINTS_3 = [
 
 
 def get_keypoints(rank: int = 0):
-    if not rank:
+    if not rank or rank == "0" or rank == 0:
         return get_kp_names()
     keypoints, keypoint_connection_rules, keypoint_flip_map, _ = get_kp_names()
     sm_keypoints = eval(f"KEYPOINTS_{rank}")
@@ -142,7 +142,7 @@ def get_keypoints(rank: int = 0):
     # original_indices = list(idx_orig_to_now.keys())
     sm_keypoint_connection_rules = []
     for (a, b, c) in keypoint_connection_rules:
-        if a in original_indices and b in original_indices:
+        if a in sm_keypoints and b in sm_keypoints:
             sm_keypoint_connection_rules.append((a, b, c))
     sm_keypoint_flip_map = []
     for a, b in keypoint_flip_map:
@@ -294,9 +294,9 @@ def filter_keypoints(ann: dict, filter_ids: Set) -> dict:
     keypoints = ann["keypoints"]
 
     new_kp = []
-    for i, _ in enumerate(keypoints):
-        if (i // 3) in filter_ids:
-            new_kp.extend(keypoints[i // 3:i // 3 + 3])
+
+    for i in filter_ids:
+        new_kp.extend(keypoints[i * 3:i * 3 + 3])
     ann["num_keypoints"] = len(new_kp[2::3])
     ann["keypoints"] = new_kp
     return ann

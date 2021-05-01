@@ -14,7 +14,6 @@ from detectron2.utils.visualizer import Visualizer
 @hydra.main(config_name='config', config_path='conf')
 def main(args):
     configure_logger(args)
-    # args.coco_json_path = os.path.join(".", args.coco_json_path)
     register_conflab_dataset(args)
 
     if args.data_plot:

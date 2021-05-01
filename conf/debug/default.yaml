@@ -4,7 +4,11 @@ name: "dbg_base"
 
 dataset: "conflab-dataset-debug"
 coco_json_path: "store/dbg_conflab_coco.json"
-coco_json_path_train: "store/dbg_conflab_coco_train.json"
-coco_json_path_test: "store/dbg_conflab_coco_test.json"
+
+# whether to use small keypoint
+kp_rank: 0 # 1,2,3
+
+coco_json_path_train: "store/dbg_conflab_coco_train${coco_json_prefix}${kp_rank}.json"
+coco_json_path_test: "store/dbg_conflab_coco_test${coco_json_prefix}${kp_rank}.json"
 
 total_ann_per_file: 5

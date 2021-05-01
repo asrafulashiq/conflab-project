@@ -123,8 +123,9 @@ def main(args: DictConfig):
     conflab_dataset.register_conflab_dataset(args)
 
     if args.create_coco:
+        pass
         # only create dataset
-        return
+        # return
 
     cfg = setup(args)
 
@@ -158,7 +159,7 @@ def main(args: DictConfig):
 def main_spawn(args: DictConfig):
     # ddp spawn
     launch(main,
-           args.num_gpus,
+           args.ngpus,
            machine_rank=args.machine_rank,
            num_machines=args.num_machines,
            dist_url=args.dist_url,

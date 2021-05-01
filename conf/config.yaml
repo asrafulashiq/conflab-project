@@ -26,7 +26,7 @@ split_path: ""
 coco_json_prefix: ""
 
 # whether to use small keypoint
-kp_rank: "" # 1,2,3
+kp_rank: 0 # 1,2,3
 
 coco_json_path_train: "store/conflab_coco_train${coco_json_prefix}${kp_rank}.json"
 coco_json_path_test: "store/conflab_coco_test${coco_json_prefix}${kp_rank}.json"
@@ -69,7 +69,8 @@ roi_thresh: 0.5
 
 size: [960, 540]
 size_test: ${size}
-half_crop: false
+
+half_crop: false # NOTE whether to use small number of data, change the `split` default
 
 # data creation
 thresh_null_kp: 0.1 # upper limit for null values: if less than 10% are null values, pick the image
@@ -80,7 +81,7 @@ total_ann_per_file: null
 # ddp_spawn
 machine_rank: 0
 num_machines: 1
-num_gpus: 1
+ngpus: 1
 
 dist_url: "env://" #"tcp://127.0.0.1:3200"
 
@@ -91,6 +92,7 @@ world_size: 1
 accelerator: "ddp" # "ddp_spawn"
 
 seed: 0
+
 benchmark: false
 
 hydra:
