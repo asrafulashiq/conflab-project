@@ -28,6 +28,6 @@ if [ $launcher = "slurm" ]; then
     LAUNCHER="launcher=slurm ngpus=1 timeout=01:20:00 mem_per_cpu=20000 cpus_per_task=2"
 fi
 
-cmd="python main.py create_coco=true  name=data_${each_split} ${LAUNCHER}"
+cmd="python main.py create_coco=true  name=data ${LAUNCHER}"
 echo $cmd
 eval $cmd
