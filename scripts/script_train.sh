@@ -27,7 +27,7 @@ fi
 for rank in "0" "1" "2" "3"; do
 
     zoo=${task}_${backbone} ${LAUNCHER}
-    cmd="python main.py mode=${mode} create_coco=false name=${zoo}_kr_${rank} \
+    cmd="python main.py mode=${mode} create_coco=true name=${zoo}_kr_${rank} \
         task=${task} zoo=${zoo} ${LAUNCHER} kp_rank=${rank}"
     echo $cmd
     eval $cmd
