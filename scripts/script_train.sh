@@ -34,7 +34,11 @@ for rank in "${ranks[@]}"; do
         extra=""
         suff=""
         if [ ${mode} == "test" ]; then
-            extra="extra checkpoint=ckpt/${name}/model_final_pth.ckpt"
+            checkpoint=ckpt/${name}/model_final_pth.ckpt
+            if [ ! -e ${checkpoint} ]; then
+                exit
+            fi
+            extra="extra checkpoint=${checkpoint}"
             suff="_test"
         fi
 
