@@ -28,7 +28,16 @@ fi
 
 for backbone in "${backbones[@]}"; do
     zoo=${task}_${backbone}
-    cmd="python main.py mode=${mode} create_coco=false name=${zoo} \
+    name=${zoo}
+
+    extra=""
+    suff=""
+    if [ ${mode} == "test" ]; then
+        extra="extra checkpoint=ckpt/${name}/model_final_pth.ckpt"
+        suff="_test"
+    fi
+
+    cmd="python main.py mode=${mode} create_coco=false name=${zoo}${suff} \
         task=${task} zoo=${zoo} ${LAUNCHER}"
     echo $cmd
     eval $cmd
