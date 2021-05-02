@@ -36,6 +36,7 @@ for rank in "${ranks[@]}"; do
         if [ ${mode} == "test" ]; then
             checkpoint=ckpt/${name}/model_final_pth.ckpt
             if [ ! -e ${checkpoint} ]; then
+                echo ${checkpoint} does not exist
                 exit
             fi
             extra="extra checkpoint=${checkpoint}"
