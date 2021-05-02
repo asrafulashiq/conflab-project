@@ -1,6 +1,6 @@
 launcher="slurm"
 task=detection
-backbone=R50_FPN
+backbones=("R50_FPN")
 mode="train"
 while getopts "l:t:b:m:r:" opt; do
     case ${opt} in
@@ -11,7 +11,7 @@ while getopts "l:t:b:m:r:" opt; do
         task=$OPTARG
         ;;
     b)
-        backbone=$OPTARG
+        backbones=($OPTARG)
         ;;
     m)
         mode="$OPTARG"
@@ -26,8 +26,10 @@ if [ $launcher = "slurm" ]; then
     LAUNCHER="launcher=slurm ngpus=4 timeout=06:00:00 mem_per_cpu=10000 cpus_per_task=6"
 fi
 
-zoo=${task}_${backbone}
-cmd="python main.py mode=${mode} create_coco=false name=${zoo} \
+for backbone in "${backbones[@]}"; do
+    zoo=${task}_${backbone}
+    cmd="python main.py mode=${mode} create_coco=false name=${zoo} \
         task=${task} zoo=${zoo} ${LAUNCHER}"
-echo $cmd
-eval $cmd
+    echo $cmd
+    eval $cmd
+done

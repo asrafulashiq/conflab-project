@@ -1,6 +1,6 @@
 launcher="slurm"
 task=keypoint
-backbone=R50_FPN
+backbones=(R50_FPN)
 ranks=("0" "1" "2" "3")
 mode="train"
 while getopts "l:t:b:m:r:" opt; do
@@ -12,7 +12,7 @@ while getopts "l:t:b:m:r:" opt; do
         task=$OPTARG
         ;;
     b)
-        backbone=$OPTARG
+        backbones=($OPTARG)
         ;;
     m)
         mode="$OPTARG"
@@ -28,10 +28,11 @@ if [ $launcher = "slurm" ]; then
 fi
 
 for rank in "${ranks[@]}"; do
-
-    zoo=${task}_${backbone}
-    cmd="python main.py mode=${mode} create_coco=true name=${zoo}_kr_${rank} \
+    for backbone in "${backbones[@]}"; do
+        zoo=${task}_${backbone}
+        cmd="python main.py mode=${mode} create_coco=false name=${zoo}_kr_${rank} \
         task=${task} zoo=${zoo} ${LAUNCHER} kp_rank=${rank}"
-    echo $cmd
-    eval $cmd
+        echo $cmd
+        eval $cmd
+    done
 done
