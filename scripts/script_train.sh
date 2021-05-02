@@ -39,8 +39,10 @@ for rank in "${ranks[@]}"; do
                 echo ${checkpoint} does not exist
                 exit
             fi
-            extra="extra checkpoint=${checkpoint}"
+            extra="extra checkpoint=${checkpoint} ngpus=1"
             suff="_test"
+        else
+            extra="ngpus=4"
         fi
 
         cmd="python main.py mode=${mode} create_coco=false name=${zoo}_kr_${rank}${suff} \

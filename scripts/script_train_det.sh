@@ -23,7 +23,7 @@ while getopts "l:t:b:m:r:" opt; do
 done
 
 if [ $launcher = "slurm" ]; then
-    LAUNCHER="launcher=slurm ngpus=4 timeout=06:00:00 mem_per_cpu=10000 cpus_per_task=6"
+    LAUNCHER="launcher=slurm  timeout=06:00:00 mem_per_cpu=10000 cpus_per_task=6"
 fi
 
 for backbone in "${backbones[@]}"; do
@@ -32,9 +32,16 @@ for backbone in "${backbones[@]}"; do
 
     extra=""
     suff=""
-    if [ ${mode} == "test" ]; then
-        extra="extra checkpoint=ckpt/${name}/model_final_pth.ckpt"
+    if [ ${mode} = "test" ]; then
+        checkpoint=ckpt/${name}/model_final.pth
+        if [ ! -e ${checkpoint} ]; then
+            echo ${checkpoint} does not exist
+            exit
+        fi
+        extra="${extra} checkpoint=${checkpoint}  ngpus=1"
         suff="_test"
+    else
+        extra="ngpus=4"
     fi
 
     cmd="python main.py mode=${mode} create_coco=false name=${zoo}${suff} \
