@@ -33,8 +33,8 @@ for rank in "${ranks[@]}"; do
         name=${zoo}_kr_${rank}
         extra=""
         suff=""
-        if [ ${mode} == "test" ]; then
-            checkpoint=ckpt/${name}/model_final_pth.ckpt
+        if [ ${mode} = "test" ]; then
+            checkpoint=ckpt/${name}/model_final.pth
             if [ ! -e ${checkpoint} ]; then
                 echo ${checkpoint} does not exist
                 exit
