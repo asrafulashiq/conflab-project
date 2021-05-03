@@ -2,7 +2,9 @@ launcher="slurm"
 task=detection
 backbones=("R50_FPN")
 mode="train"
-while getopts "l:t:b:m:r:" opt; do
+half=false
+
+while getopts "l:t:b:m:r:h:" opt; do
     case ${opt} in
     l)
         launcher="$OPTARG"
@@ -18,6 +20,9 @@ while getopts "l:t:b:m:r:" opt; do
         ;;
     r)
         ranks=($OPTARG)
+        ;;
+    h)
+        half=$OPTARG
         ;;
     esac
 done
@@ -44,8 +49,12 @@ for backbone in "${backbones[@]}"; do
         extra="ngpus=4"
     fi
 
+    if [ $half = "true" ]; then
+        suff="${suff}_half"
+    fi
+
     cmd="python main.py mode=${mode} create_coco=false name=${zoo}${suff} \
-        task=${task} zoo=${zoo} ${LAUNCHER}"
+        task=${task} zoo=${zoo} ${LAUNCHER} half_crop=${half}"
     echo $cmd
     eval $cmd
 done
