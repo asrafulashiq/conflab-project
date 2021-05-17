@@ -25,5 +25,6 @@ figs/**
 logs/**
 
 checkpoint
+slurm_log
 
 !requirements.txt

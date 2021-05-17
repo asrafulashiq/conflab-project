@@ -52,7 +52,7 @@ for backbone in "${backbones[@]}"; do
     if [ $half = "true" ]; then
         suff="${suff}_half"
     fi
-
+    echo hi
     cmd="python main.py mode=${mode} create_coco=false name=${zoo}${suff} \
         task=${task} zoo=${zoo} ${LAUNCHER} half_crop=${half}"
     echo $cmd
