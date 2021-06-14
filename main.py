@@ -82,6 +82,10 @@ def setup(args):
     cfg.SOLVER.REFERENCE_WORLD_SIZE = 1
     cfg.SOLVER.CHECKPOINT_PERIOD = 1000
 
+    if args.task_name == 'keypoint':
+        cfg.MODEL.ROI_KEYPOINT_HEAD.NUM_KEYPOINTS = args.num_keypoints
+        # cfg.TEST.KEYPOINT_OKS_SIGMAS = args.num_keypoints
+
     if args.eval_only is False:
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
         cfg.SOLVER.IMS_PER_BATCH = args.batch_size
@@ -116,7 +120,7 @@ def main(args: DictConfig):
     rich.print("Command Line Args:\n{}".format(
         OmegaConf.to_yaml(args, resolve=True)))
 
-    if args.accelerator == "ddp":
+    if args.accelerator == "ddp" and args.ngpus > 1:
         utils_dist.init_distributed_mode(args)
 
     # register dataset

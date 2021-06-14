@@ -23,7 +23,7 @@ Progress:
   ✔ bash scripts/script_ablation.sh @started(21-04-25 18:10) @done(21-05-01 18:11) @lasted(6d1m7s)
   ☐ bash scripts/script_train.sh -b "R50_FPN R101_FPN" [-h true]
   ☐ bash scripts/script_train_det.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" [-h true]
-
+  ☐ bash scripts/script_train_det.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" -m test
 
 
 Important command:

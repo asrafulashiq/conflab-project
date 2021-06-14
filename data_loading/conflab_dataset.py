@@ -127,6 +127,8 @@ def register_conflab_dataset(args: DictConfig) -> None:
     keypoints, keypoint_connection_rules, keypoint_flip_map, kp_indices = get_keypoints(
         args.kp_rank)
 
+    args.num_keypoints = len(keypoints)
+
     if args.create_coco:
         convert_to_coco = (not os.path.exists(
             args.coco_json_path)) or args.force_register
