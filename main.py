@@ -84,7 +84,7 @@ def setup(args):
 
     if args.task_name == 'keypoint':
         cfg.MODEL.ROI_KEYPOINT_HEAD.NUM_KEYPOINTS = args.num_keypoints
-        cfg.TEST.KEYPOINT_OKS_SIGMAS = args.oks_std
+        cfg.TEST.KEYPOINT_OKS_SIGMAS = [x / 1000 for x in args.oks_std]
 
     if args.eval_only is False:
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(args.model_zoo)
