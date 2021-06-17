@@ -133,6 +133,8 @@ def main(args: DictConfig):
 
     cfg = setup(args)
 
+    print(f"Number of keypoints: {args.num_keypoints}")
+
     if args.eval_only is False:
         configure_logger(args, fileonly=True)
 

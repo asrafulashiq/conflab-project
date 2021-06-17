@@ -25,6 +25,7 @@ Progress:
   ☐ bash scripts/script_train_det.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" [-h true]
   ☐ bash scripts/script_train_det.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" -m test
 
+  ☐ bash scripts/script_train_kp.sh -b "R50_FPN R101_FPN"
 
 Important command:
   - `python data_create.py create_coco=true [+debug=default]`
