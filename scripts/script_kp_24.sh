@@ -57,7 +57,7 @@ for rank in "${ranks[@]}"; do
         cmd="python main.py mode=${mode} create_coco=false \
         name=kp${coco_json_prefix}_${zoo}_kr_${rank}${suff} \
         task=${task} 'train_cam=[cam2,cam4]' zoo=${zoo} \
-        coco_json_prefix=${coco_json_prefix} create_coco=true convert_to_coco=false \
+        coco_json_prefix=${coco_json_prefix} create_coco=true force_register=false \
         ${LAUNCHER} kp_rank=${rank} ${extra} half_crop=${half}"
         echo $cmd
         eval $cmd
