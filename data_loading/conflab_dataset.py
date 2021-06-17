@@ -10,6 +10,7 @@ from data_loading.utils import *
 from pathlib import Path
 import logging
 import json
+from data_loading.utils import KP_TO_OKS
 
 logger = logging.getLogger("detectron2")
 
@@ -127,7 +128,7 @@ def register_conflab_dataset(args: DictConfig) -> None:
     keypoints, keypoint_connection_rules, keypoint_flip_map, kp_indices = get_keypoints(
         args.kp_rank)
 
-    args.oks_std = [KP_TO_OKS[kp] for kp in keypoints]
+    args.oks_std = [int(KP_TO_OKS[kp] * 1000) for kp in keypoints]
 
     args.num_keypoints = len(keypoints)
 
