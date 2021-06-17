@@ -116,11 +116,29 @@ def sanity_check_kp_bb(kps, bb):
             # raise ValueError("sanity check failed")
 
 
+kpt_oks_sigmas = np.array([
+    .26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87,
+    .87, .89, .89
+]) / 10.0
+
+ORIG_COCO_KEYPOINTS = [
+    'nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear', 'leftShoulder',
+    'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist',
+    'leftHip', 'rightHip', 'leftKnee', 'rightKnee', 'leftAnkle', 'rightAnkle'
+]
+
 KEYPOINTS = [
     "head", "nose", "neck", "rightShoulder", "rightElbow", "rightWrist",
     "leftShoulder", "leftElbow", "leftWrist", "rightHip", "rightKnee",
     "rightAnkle", "leftHip", "leftKnee", "leftAnkle", "rightFoot", "leftFoot"
 ]
+
+OKS = np.array([
+    0.026, 0.026, 0.026, 0.08, 0.072, 0.062, 0.079, 0.072, 0.062, 0.10, 0.087,
+    0.089, 0.10, 0.087, .089, 0.09, 0.09
+])
+
+KP_TO_OKS = dict(zip(KEYPOINTS, OKS))
 
 KEYPOINTS_1 = ["head", "nose", "neck", "rightShoulder", "leftShoulder"]
 KEYPOINTS_2 = [
