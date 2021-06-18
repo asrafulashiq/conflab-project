@@ -18,7 +18,8 @@ logger = logging.getLogger("detectron2")
 def convert_conflab_to_coco(img_root_dir: str,
                             annotation_dir: str,
                             total_ann: Optional[int] = None,
-                            thresh_null: float = 0.1) -> List[Dict]:
+                            thresh_null: float = 0.1,
+                            info_path=None) -> List[Dict]:
 
     counter_image = 0
     counter = 0
@@ -114,6 +115,10 @@ def convert_conflab_to_coco(img_root_dir: str,
         ann_stat.stats()
 
     ann_stat.stats()
+
+    with open(info_path, "wb") as fp:
+        pickle.dump(ann_stat, fp)
+
     return coco_data
 
 
@@ -141,7 +146,8 @@ def register_conflab_dataset(args: DictConfig) -> None:
                 img_root_dir=args.img_root_dir,
                 annotation_dir=args.ann_dir,
                 total_ann=args.total_ann_per_file,
-                thresh_null=args.thresh_null_kp)
+                thresh_null=args.thresh_null_kp,
+                info_path=args.info_path)
 
             Path(args.coco_json_path).parent.mkdir(exist_ok=True, parents=True)
             with open(args.coco_json_path, "w") as fp:

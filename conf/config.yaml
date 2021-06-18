@@ -31,6 +31,8 @@ kp_rank: 0 # 1,2,3
 coco_json_path_train: "store/conflab_coco_train${coco_json_prefix}${kp_rank}.json"
 coco_json_path_test: "store/conflab_coco_test${coco_json_prefix}${kp_rank}.json"
 
+info_path: store/data-info.pkl
+
 test_cam:
   - cam6 # use camera 6 as test camera
 
