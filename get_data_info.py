@@ -38,7 +38,7 @@ for cam in cam_keys:
     print(f"Camera {cam}")
     print("*" * 20)
 
-    print(f"\Imgaes: {tot_im}")
+    print(f"\tImgaes: {tot_im}")
     print(f"\tPerson: {tot_per}")
     print(f"\tKP: {tot_pt}")
     print(f"\tNull: {null_pt / tot_pt: .4f}")
