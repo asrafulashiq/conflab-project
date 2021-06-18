@@ -40,7 +40,7 @@ for cam in cam_keys:
 
     print(f"\tImgaes: {tot_im}")
     print(f"\tPerson: {tot_per}")
-    print(f"\tKP: {tot_pt}")
+    print(f"\tKP: {tot_pt - null_pt}")
     print(f"\tNull: {null_pt / tot_pt: .4f}")
 
 total_im = sum([v['im'] for v in cam_info.values()])
