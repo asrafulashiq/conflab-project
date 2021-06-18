@@ -38,8 +38,8 @@ for cam in cam_keys:
     print(f"\KP: {tot_pt}")
     print(f"\tNull: {null_pt / tot_pt: .4f}")
 
-total_per = sum([v['total_person'] for v in cam_info.values()])
-total_kp = sum([v['total_pt'] for v in cam_info.values()])
+total_per = sum([v['person'] for v in cam_info.values()])
+total_kp = sum([v['keypoint'] for v in cam_info.values()])
 total_null = sum([v['null'] for v in cam_info.values()])
 
 print(total_per, total_kp, total_null)
