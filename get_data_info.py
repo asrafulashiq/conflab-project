@@ -35,7 +35,7 @@ for cam in cam_keys:
     print("*" * 20)
 
     print(f"\tPerson: {tot_per}")
-    print(f"\KP: {tot_pt}")
+    print(f"\tKP: {tot_pt}")
     print(f"\tNull: {null_pt / tot_pt: .4f}")
 
 total_per = sum([v['person'] for v in cam_info.values()])
