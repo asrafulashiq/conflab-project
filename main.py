@@ -49,7 +49,8 @@ class Trainer(DefaultTrainer):
         return COCOEvaluator(dataset_name,
                              cfg.TASKS,
                              False,
-                             output_dir=output_folder)
+                             output_dir=output_folder,
+                             kpt_oks_sigmas=cfg.TEST.KEYPOINT_OKS_SIGMAS)
 
 
 class Predictor(DefaultPredictor):
@@ -81,6 +82,7 @@ def setup(args):
 
     cfg.SOLVER.REFERENCE_WORLD_SIZE = 1
     cfg.SOLVER.CHECKPOINT_PERIOD = 1000
+    cfg.TEST.KEYPOINT_OKS_SIGMAS = ()
 
     if args.task_name == 'keypoint':
         cfg.MODEL.ROI_KEYPOINT_HEAD.NUM_KEYPOINTS = args.num_keypoints
