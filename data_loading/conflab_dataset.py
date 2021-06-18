@@ -117,8 +117,8 @@ def convert_conflab_to_coco(img_root_dir: str,
 
     ann_stat.stats()
 
-    # with open(info_path, "wb") as fp:
-    #     pickle.dump(ann_stat, fp)
+    with open(info_path, "wb") as fp:
+        pickle.dump(ann_stat.info_im, fp)
 
     return coco_data
 
