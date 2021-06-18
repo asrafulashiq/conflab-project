@@ -31,8 +31,8 @@ for cam in cam_keys:
     tot_im = len(cam_keys[cam])
 
     cam_info[cam]['person'] = tot_per
-    cam_info[cam]['keypoint'] = tot_pt
-    cam_info[cam]['null'] = null_pt
+    cam_info[cam]['keypoint'] = tot_pt - null_pt
+    # cam_info[cam]['null'] = null_pt
     cam_info[cam]['im'] = tot_im
 
     print(f"Camera {cam}")
