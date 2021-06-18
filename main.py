@@ -128,7 +128,7 @@ def main(args: DictConfig):
     # register dataset
     conflab_dataset.register_conflab_dataset(args)
 
-    if args.create_coco:
+    if args.create_coco and args.force_register:
         pass
         # only create dataset
         # return
