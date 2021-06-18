@@ -11,6 +11,7 @@ from pathlib import Path
 import logging
 import json
 from data_loading.utils import KP_TO_OKS
+import pickle
 
 logger = logging.getLogger("detectron2")
 
