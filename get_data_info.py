@@ -24,7 +24,7 @@ for cam in cam_keys:
     tot_pt = 0
     null_pt = 0
     for files in cam_keys[cam]:
-        _data = cam_keys[cam][files]
+        _data = data[files]
         tot_per += _data['total_person']
         tot_pt += _data['total_pt']
         null_pt += _data['null_pt']
