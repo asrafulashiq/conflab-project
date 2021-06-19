@@ -35,7 +35,9 @@ fi
 for rank in "${ranks[@]}"; do
     for backbone in "${backbones[@]}"; do
         zoo=${task}_${backbone}
-        name=${zoo}_kr_${rank}
+        coco_json_prefix=_4
+
+        name=kp${coco_json_prefix}_${zoo}_kr_${rank}
         extra=""
         suff=""
         if [ ${mode} = "test" ]; then
@@ -54,7 +56,6 @@ for rank in "${ranks[@]}"; do
             suff="${suff}_half"
         fi
 
-        coco_json_prefix=_4
         cmd="python main.py mode=${mode} create_coco=true \
         name=kp${coco_json_prefix}_${zoo}_kr_${rank}${suff} \
         task=${task} 'train_cam=[cam4]' zoo=${zoo} \
