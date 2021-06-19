@@ -34,7 +34,7 @@ fi
 for rank in "${ranks[@]}"; do
     for backbone in "${backbones[@]}"; do
         zoo=${task}_${backbone}
-        name=${zoo}_kr_${rank}
+        name=kp_${zoo}_kr_${rank}
         extra=""
         suff=""
         if [ ${mode} = "test" ]; then
