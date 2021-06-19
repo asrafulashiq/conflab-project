@@ -34,10 +34,13 @@ fi
 
 for rank in "${ranks[@]}"; do
     for backbone in "${backbones[@]}"; do
+
+        coco_json_prefix=_2
         zoo=${task}_${backbone}
-        name=${zoo}_kr_${rank}
+        name=kp${coco_json_prefix}_${zoo}_kr_${rank}
         extra=""
         suff=""
+
         if [ ${mode} = "test" ]; then
             checkpoint=ckpt/${name}/model_final.pth
             if [ ! -e ${checkpoint} ]; then
@@ -54,8 +57,7 @@ for rank in "${ranks[@]}"; do
             suff="${suff}_half"
         fi
 
-        coco_json_prefix=_2
-        cmd="python -m pdb main.py mode=${mode} create_coco=true \
+        cmd="python  main.py mode=${mode} create_coco=true \
         name=kp${coco_json_prefix}_${zoo}_kr_${rank}${suff} \
         task=${task} 'train_cam=[cam2]' zoo=${zoo} \
         coco_json_prefix=${coco_json_prefix} create_coco=true force_register=false \
