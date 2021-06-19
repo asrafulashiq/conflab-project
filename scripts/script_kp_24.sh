@@ -1,7 +1,8 @@
 launcher="slurm"
 task=keypoint
 backbones=(R50_FPN)
-ranks=("0" "1" "2" "3")
+# ranks=("0" "1" "2" "3")
+ranks=("0")
 mode="train"
 half=false
 while getopts "l:t:b:m:r:h:" opt; do
@@ -54,7 +55,7 @@ for rank in "${ranks[@]}"; do
         fi
 
         coco_json_prefix=_24
-        cmd="python main.py mode=${mode} create_coco=false \
+        cmd="python main.py mode=${mode} create_coco=true \
         name=kp${coco_json_prefix}_${zoo}_kr_${rank}${suff} \
         task=${task} 'train_cam=[cam2,cam4]' zoo=${zoo} \
         coco_json_prefix=${coco_json_prefix} create_coco=true force_register=false \

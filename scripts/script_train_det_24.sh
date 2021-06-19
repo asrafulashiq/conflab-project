@@ -54,7 +54,7 @@ for backbone in "${backbones[@]}"; do
     fi
 
     coco_json_prefix=_24
-    cmd="python main.py mode=${mode} create_coco=false name=${zoo}${coco_json_prefix}${suff} \
+    cmd="python main.py mode=${mode} create_coco=true name=${zoo}${coco_json_prefix}${suff} \
         task=${task} 'train_cam=[cam2,cam4]' coco_json_prefix=${coco_json_prefix}  \
         zoo=${zoo} ${LAUNCHER} ${extra} half_crop=${half}"
     echo $cmd
