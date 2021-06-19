@@ -33,7 +33,8 @@ fi
 
 for backbone in "${backbones[@]}"; do
     zoo=${task}_${backbone}
-    name=${zoo}
+    coco_json_prefix=_2
+    name=${zoo}${coco_json_prefix}
 
     extra=""
     suff=""
@@ -53,7 +54,6 @@ for backbone in "${backbones[@]}"; do
         suff="${suff}_half"
     fi
 
-    coco_json_prefix=_2
     cmd="python main.py mode=${mode} create_coco=true name=${zoo}${coco_json_prefix}${suff} \
         task=${task} 'train_cam=[cam2]' coco_json_prefix=${coco_json_prefix}  \
         zoo=${zoo} ${LAUNCHER} ${extra} half_crop=${half}"
