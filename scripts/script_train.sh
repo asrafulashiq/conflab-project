@@ -53,7 +53,7 @@ for rank in "${ranks[@]}"; do
             suff="${suff}_half"
         fi
 
-        cmd="python main.py mode=${mode} create_coco=false name=${zoo}_kr_${rank}${suff} \
+        cmd="python main.py mode=${mode} create_coco=true name=${zoo}_kr_${rank}${suff} \
         task=${task} zoo=${zoo} ${LAUNCHER} kp_rank=${rank} ${extra} half_crop=${half}"
         echo $cmd
         eval $cmd

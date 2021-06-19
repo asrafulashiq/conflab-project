@@ -53,7 +53,7 @@ for backbone in "${backbones[@]}"; do
         suff="${suff}_half"
     fi
 
-    cmd="python main.py mode=${mode} create_coco=false name=${zoo}${suff} \
+    cmd="python main.py mode=${mode} create_coco=true name=${zoo}${suff} \
         task=${task} zoo=${zoo} ${LAUNCHER} ${extra} half_crop=${half}"
     echo $cmd
     eval $cmd
