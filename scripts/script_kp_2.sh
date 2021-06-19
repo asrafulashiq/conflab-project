@@ -55,7 +55,7 @@ for rank in "${ranks[@]}"; do
         fi
 
         coco_json_prefix=_2
-        cmd="python main.py mode=${mode} create_coco=true \
+        cmd="python -m pdb main.py mode=${mode} create_coco=true \
         name=kp${coco_json_prefix}_${zoo}_kr_${rank}${suff} \
         task=${task} 'train_cam=[cam2]' zoo=${zoo} \
         coco_json_prefix=${coco_json_prefix} create_coco=true force_register=false \
