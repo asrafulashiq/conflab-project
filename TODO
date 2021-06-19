@@ -33,6 +33,7 @@ Progress:
   ☐ bash scripts/script_train_det_24.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" @started(21-06-17 23:07)
   
   
+  ☐ bash scripts/script_train_det_2.sh -b "R50_FPN R50_C4 R101_FPN R101_C4"
   ☐ bash scripts/script_train_det_248.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" @started(21-06-17 23:07)
   ☐ bash scripts/script_train_det_2410.sh -b "R50_FPN R50_C4 R101_FPN R101_C4" @started(21-06-17 23:07)
   ☐ bash scripts/script_kp_248.sh -b "R50_FPN R101_FPN" @started(21-06-17 08:49)
